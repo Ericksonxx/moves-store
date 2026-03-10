@@ -99,10 +99,10 @@
     .photo-gps-tag.hidden { display: none; }
 
     /* ── CAMERA OVERLAY ── */
-    .camera-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: #000; flex-direction: column; }
-    .camera-overlay.open { display: flex; }
-    #camera-video { flex: 1; width: 100%; object-fit: cover; display: block; }
-    .camera-bar { background: rgba(0,0,0,0.7); padding: 16px 20px calc(32px + env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .camera-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: #000; }
+    .camera-overlay.open { display: block; }
+    #camera-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .camera-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 301; background: rgba(0,0,0,0.75); padding: 20px 32px calc(20px + env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: space-between; }
     .camera-cancel { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 14px; font-weight: 600; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
     .camera-shutter { width: 80px; height: 80px; border-radius: 50%; background: #fff; border: 5px solid rgba(255,255,255,0.5); cursor: pointer; transition: transform 0.1s; flex-shrink: 0; }
     .camera-shutter:active { transform: scale(0.92); }
@@ -175,7 +175,7 @@
       <div class="id-icon">🏪</div>
       <div class="id-brand" id="id-brand-name">Nike · SS26 Campaign</div>
       <div class="id-title" id="id-title">Primavera Window Installation</div>
-      <div class="id-store" id="id-store-name">Loading store info...</div>
+      <div class="id-store" id="id-store-name" style="font-size:18px;font-weight:700;margin-top:4px">Loading…</div>
     </div>
     <div class="id-bottom">
       <div class="id-label">Installation steps</div>
@@ -331,12 +331,17 @@ window.addEventListener('load', async () => {
       let storeAddress = null;
       if (storeId) {
         try {
-          const sr = await fetch(`${SUPABASE_URL}/rest/v1/stores?id=eq.${storeId}&select=name,address`, {
+          const sr = await fetch(`${SUPABASE_URL}/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=name,address,contact_name,contact_phone`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
           });
-          const sd = await sr.json();
-          if (sd[0]) { storeName = sd[0].name; storeAddress = sd[0].address; }
-        } catch(e){}
+          if (sr.ok) {
+            const sd = await sr.json();
+            if (Array.isArray(sd) && sd[0]) {
+              storeName    = sd[0].name;
+              storeAddress = sd[0].address;
+            }
+          }
+        } catch(e){ console.warn('Store fetch failed:', e); }
       }
 
       if (data[0]) {
@@ -364,7 +369,7 @@ window.addEventListener('load', async () => {
   // Populate identify screen
   document.getElementById('id-brand-name').textContent = project.brand;
   document.getElementById('id-title').textContent = project.name;
-  document.getElementById('id-store-name').textContent = project.store;
+  document.getElementById('id-store-name').textContent = project.store !== project.brand ? project.store : '';
   const preview = document.getElementById('id-steps-preview');
   project.steps.forEach((_, i) => {
     const d = document.createElement('div');
