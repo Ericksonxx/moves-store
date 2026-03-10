@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoveOps Store — My Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#F5F2ED;--ink:#0D0D0D;--surface:#FFFFFF;
+      --accent:#1A3A2A;--accent2:#2D6048;
+      --muted:#888880;--muted2:#BDBDB5;
+      --border:#E2DED7;--border2:#EDE9E3;
+      --red:#C0392B;--red-bg:rgba(192,57,43,0.07);
+      --green-bg:rgba(45,96,72,0.08);
+    }
+    html,body{height:100%;}
+    body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;display:flex;overflow:hidden;}
+
+    /* SIDEBAR — identical to dashboard */
+    .sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;}
+    .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;}
+    .brand-mark{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .brand-mark svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;}
+    .brand-text{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.5px;}
+    .brand-text small{display:block;font-size:10px;color:var(--muted);letter-spacing:1px;}
+    .sidebar-section{padding:20px 12px 8px;}
+    .sidebar-section-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted2);padding:0 8px;margin-bottom:4px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:1px;text-decoration:none;}
+    .nav-item:hover{background:var(--bg);color:var(--ink);}
+    .nav-item.active{background:var(--green-bg);color:var(--accent);font-weight:600;}
+    .nav-item .ni{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+    .sidebar-footer{margin-top:auto;padding:16px 12px;border-top:1px solid var(--border2);}
+    .user-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer;transition:background .15s;}
+    .user-card:hover{background:var(--bg);}
+    .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;}
+    .user-name{font-size:13px;font-weight:600;color:var(--ink);}
+    .user-role{font-size:11px;color:var(--muted);}
+
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+    .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .topbar-title{font-size:16px;font-weight:700;color:var(--ink);}
+    .btn-sm{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;font-family:'DM Sans',sans-serif;}
+    .btn-sm.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+    .btn-sm.ghost:hover{border-color:var(--accent);color:var(--accent);}
+    .btn-sm.primary{background:var(--accent);color:#fff;}
+    .btn-sm.primary:hover{background:var(--accent2);}
+    .btn-sm:disabled{opacity:.5;cursor:not-allowed;}
+    .content{flex:1;overflow-y:auto;padding:36px 40px;max-width:760px;}
+
+    /* PROFILE */
+    .page-title{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+    .page-sub{font-size:14px;color:var(--muted);margin-bottom:32px;}
+
+    .avatar-row{display:flex;align-items:center;gap:20px;margin-bottom:36px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;}
+    .avatar-big{width:64px;height:64px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:'Fraunces',serif;}
+    .avatar-info{flex:1;}
+    .avatar-name{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+    .avatar-email{font-size:13px;color:var(--muted);}
+    .avatar-badge{display:inline-block;margin-top:6px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;background:var(--green-bg);color:var(--accent);padding:3px 10px;border-radius:20px;text-transform:uppercase;}
+
+    .section-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;}
+    .form-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .field{display:flex;flex-direction:column;gap:6px;}
+    .field.full{grid-column:1/-1;}
+    .field label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+    .field input,.field select{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .field input:focus,.field select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(45,96,72,.08);}
+    .field input::placeholder{color:var(--muted2);}
+    .field input[readonly]{color:var(--muted);cursor:not-allowed;background:#F5F2ED;}
+
+    .msg{border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:20px;display:none;align-items:center;gap:10px;}
+    .msg.show{display:flex;}
+    .msg.ok{background:var(--green-bg);border:1px solid rgba(45,96,72,.15);color:var(--accent);}
+    .msg.err{background:var(--red-bg);border:1px solid rgba(192,57,43,.15);color:var(--red);}
+
+    .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+
+    .danger-zone{background:var(--surface);border:1px solid rgba(192,57,43,.2);border-radius:12px;padding:24px;margin-bottom:20px;}
+    .danger-title{font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px;}
+    .danger-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+    .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:7px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+    .btn-danger:hover{background:var(--red);color:#fff;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;right:28px;z-index:500;background:var(--ink);color:#fff;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.2);transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;}
+    .toast.show{transform:translateY(0);opacity:1;}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>
+    </div>
+    <div class="brand-text">MoveOps Store<small>Brand portal</small></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><span class="ni">▦</span>Overview</a>
+    <a class="nav-item" href="dashboard.html#campaigns"><span class="ni">📋</span>Campaigns</a>
+    <a class="nav-item" href="dashboard.html#alerts"><span class="ni">🔔</span>Alerts</a>
+    <a class="nav-item" href="dashboard.html#reports"><span class="ni">📄</span>Reports</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Account</div>
+    <a class="nav-item active" href="profile.html"><span class="ni">👤</span>My profile</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-card" onclick="signOut()">
+      <div class="user-avatar" id="sidebar-avatar">?</div>
+      <div>
+        <div class="user-name" id="sidebar-name">—</div>
+        <div class="user-role" id="sidebar-email">—</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">My profile</div>
+    <button class="btn-sm ghost" onclick="signOut()">Sign out</button>
+  </div>
+  <div class="content">
+
+    <div class="page-title">Profile settings</div>
+    <div class="page-sub">Manage your account details and contact information.</div>
+
+    <div class="avatar-row">
+      <div class="avatar-big" id="avatar-initials">?</div>
+      <div class="avatar-info">
+        <div class="avatar-name" id="avatar-name">Loading…</div>
+        <div class="avatar-email" id="avatar-email">—</div>
+        <span class="avatar-badge">Brand Manager</span>
+      </div>
+    </div>
+
+    <div class="msg" id="msg-ok"><span>✓</span><span id="msg-ok-text">Saved.</span></div>
+    <div class="msg" id="msg-err"><span>⚠</span><span id="msg-err-text">Error saving.</span></div>
+
+    <!-- PERSONAL INFO -->
+    <div class="section-title">Personal information</div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="full_name" placeholder="María García">
+        </div>
+        <div class="field">
+          <label>Job title</label>
+          <input type="text" id="job_title" placeholder="Trade Marketing Manager">
+        </div>
+        <div class="field">
+          <label>Company / Brand</label>
+          <input type="text" id="company" placeholder="Marca España S.L.">
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="phone" placeholder="+34 600 000 000">
+        </div>
+        <div class="field full">
+          <label>Email (cannot be changed here)</label>
+          <input type="email" id="email_display" readonly>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-sm ghost" onclick="loadProfile()">Discard</button>
+        <button class="btn-sm primary" id="save-btn" onclick="saveProfile()">Save changes</button>
+      </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="section-title">Security</div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field">
+          <label>New password</label>
+          <input type="password" id="new_pass" placeholder="Min. 8 characters" autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label>Confirm new password</label>
+          <input type="password" id="confirm_pass" placeholder="Repeat password" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-sm primary" onclick="changePassword()">Update password</button>
+      </div>
+    </div>
+
+    <!-- DANGER -->
+    <div class="danger-zone">
+      <div class="danger-title">Sign out of all sessions</div>
+      <div class="danger-sub">This will sign you out of MoveOps Store on all devices.</div>
+      <button class="btn-danger" onclick="signOut()">Sign out</button>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+const SB  = 'https://ysltwsexfeweqjmzdahs.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzbHR3c2V4ZmV3ZXFqbXpkYWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjI4MjYsImV4cCI6MjA4ODYzODgyNn0.pgABlsoHBq9LkOqtJhXd-LF7XKMla_fgR1CbWAWpl_k';
+
+const token = sessionStorage.getItem('sb_token');
+if (!token) { window.location.href = 'login.html'; }
+
+const H = {
+  'apikey': KEY,
+  'Authorization': `Bearer ${token}`,
+  'Content-Type': 'application/json'
+};
+
+const storedUser = JSON.parse(sessionStorage.getItem('sb_user') || '{}');
+let userId = storedUser.id || null;
+let userEmail = storedUser.email || '—';
+
+// ── INIT ──────────────────────────────────────────────
+async function init() {
+  // If we don't have user id, fetch from /auth/v1/user
+  if (!userId) {
+    try {
+      const r = await fetch(`${SB}/auth/v1/user`, { headers: H });
+      const u = await r.json();
+      userId    = u.id;
+      userEmail = u.email;
+      sessionStorage.setItem('sb_user', JSON.stringify({ id: u.id, email: u.email }));
+    } catch(e) { toast('⚠ Could not load user'); return; }
+  }
+
+  document.getElementById('avatar-email').textContent   = userEmail;
+  document.getElementById('sidebar-email').textContent  = userEmail;
+  document.getElementById('email_display').value        = userEmail;
+
+  await loadProfile();
+}
+
+async function loadProfile() {
+  try {
+    const r = await fetch(`${SB}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers: H });
+    const rows = await r.json();
+    const p = rows[0] || {};
+
+    document.getElementById('full_name').value  = p.full_name  || '';
+    document.getElementById('job_title').value  = p.job_title  || '';
+    document.getElementById('company').value    = p.company    || '';
+    document.getElementById('phone').value      = p.phone      || '';
+
+    const name = p.full_name || userEmail.split('@')[0];
+    document.getElementById('avatar-name').textContent    = name;
+    document.getElementById('avatar-initials').textContent = initials(name);
+    document.getElementById('sidebar-name').textContent   = name;
+
+  } catch(e) { toast('⚠ Could not load profile'); }
+}
+
+function initials(name) {
+  return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('') || '?';
+}
+
+// ── SAVE PROFILE ──────────────────────────────────────
+async function saveProfile() {
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  hideMsg();
+
+  const body = {
+    id:         userId,
+    full_name:  document.getElementById('full_name').value.trim(),
+    job_title:  document.getElementById('job_title').value.trim(),
+    company:    document.getElementById('company').value.trim(),
+    phone:      document.getElementById('phone').value.trim(),
+    updated_at: new Date().toISOString()
+  };
+
+  try {
+    const r = await fetch(`${SB}/rest/v1/profiles?id=eq.${userId}`, {
+      method: 'PATCH',
+      headers: { ...H, 'Prefer': 'return=representation' },
+      body: JSON.stringify(body)
+    });
+
+    if (!r.ok) {
+      // Row might not exist yet — insert instead
+      const r2 = await fetch(`${SB}/rest/v1/profiles`, {
+        method: 'POST',
+        headers: { ...H, 'Prefer': 'return=representation' },
+        body: JSON.stringify(body)
+      });
+      if (!r2.ok) throw new Error(await r2.text());
+    }
+
+    showMsg('ok', 'Profile saved successfully.');
+    await loadProfile();
+    toast('✓ Profile updated');
+
+  } catch(e) {
+    showMsg('err', e.message || 'Could not save profile.');
+  }
+  btn.textContent = 'Save changes'; btn.disabled = false;
+}
+
+// ── CHANGE PASSWORD ───────────────────────────────────
+async function changePassword() {
+  const np = document.getElementById('new_pass').value;
+  const cp = document.getElementById('confirm_pass').value;
+  if (!np || np.length < 8) { toast('⚠ Password must be at least 8 characters'); return; }
+  if (np !== cp) { toast('⚠ Passwords do not match'); return; }
+
+  try {
+    const r = await fetch(`${SB}/auth/v1/user`, {
+      method: 'PUT',
+      headers: H,
+      body: JSON.stringify({ password: np })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Failed');
+    document.getElementById('new_pass').value = '';
+    document.getElementById('confirm_pass').value = '';
+    showMsg('ok', 'Password updated successfully.');
+    toast('✓ Password changed');
+  } catch(e) {
+    showMsg('err', e.message || 'Could not update password.');
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function showMsg(type, text) {
+  hideMsg();
+  const el = document.getElementById(type === 'ok' ? 'msg-ok' : 'msg-err');
+  const txt = document.getElementById(type === 'ok' ? 'msg-ok-text' : 'msg-err-text');
+  txt.textContent = text;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+function hideMsg() {
+  document.getElementById('msg-ok').classList.remove('show');
+  document.getElementById('msg-err').classList.remove('show');
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function signOut() {
+  sessionStorage.removeItem('sb_token');
+  sessionStorage.removeItem('sb_user');
+  sessionStorage.removeItem('sb_refresh');
+  window.location.href = 'login.html';
+}
+
+init();
+</script>
+</body>
+</html>
