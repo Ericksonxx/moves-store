@@ -195,6 +195,35 @@
     .tab-btn.active{background:var(--accent);color:#fff;}
     .tab-btn:hover:not(.active){background:var(--bg);color:var(--ink);}
 
+    /* STORE ACTIVITY MODAL */
+    .store-modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .store-modal-overlay.open{opacity:1;pointer-events:all;}
+    .store-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:620px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;transform:translateY(16px);transition:transform .25s;position:relative;overflow:hidden;}
+    .store-modal-overlay.open .store-modal-box{transform:translateY(0);}
+    .store-modal-head{padding:24px 28px 20px;border-bottom:1px solid var(--border2);flex-shrink:0;}
+    .store-modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+    .store-modal-meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;}
+    .store-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:4px 8px;}
+    .store-modal-close:hover{color:var(--ink);}
+    .store-modal-body{flex:1;overflow-y:auto;padding:20px 28px;}
+    .store-modal-section{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted2);margin:20px 0 10px;}
+    .store-modal-section:first-child{margin-top:0;}
+    .store-event{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border2);}
+    .store-event:last-child{border-bottom:none;}
+    .store-event-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+    .store-event-icon.success{background:var(--green-bg);}
+    .store-event-icon.warning{background:var(--gold-bg);}
+    .store-event-icon.error{background:var(--red-bg);}
+    .store-event-body{flex:1;}
+    .store-event-msg{font-size:13px;font-weight:500;color:var(--ink);}
+    .store-event-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-top:2px;}
+    .store-event-gps{font-size:11px;color:var(--accent2);margin-top:2px;}
+    .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
+    .photo-thumb{aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--bg);border:1px solid var(--border);}
+    .photo-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer;transition:opacity .15s;}
+    .photo-thumb img:hover{opacity:.85;}
+    .store-modal-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;}
+
     /* TOAST */
     .toast{position:fixed;bottom:28px;right:28px;z-index:500;background:var(--ink);color:#fff;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.2);transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;}
     .toast.show{transform:translateY(0);opacity:1;}
@@ -251,7 +280,6 @@
     <div class="topbar-title" id="topbar-title">Overview</div>
     <div class="topbar-actions">
       <button class="btn-sm ghost" id="btn-export" onclick="exportReport()" style="display:none">↓ Export PDF</button>
-      <button class="btn-sm ghost" id="btn-link" onclick="copyStoreLink()" style="display:none">🔗 Store link</button>
       <button class="btn-sm primary" onclick="openModal()">+ New campaign</button>
     </div>
   </div>
@@ -301,7 +329,6 @@
           <div class="detail-meta" id="detail-meta"></div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;margin-top:4px">
-          <button class="btn-sm ghost" onclick="copyStoreLink()">🔗 Store link</button>
           <button class="btn-sm ghost" id="btn-toggle-active" onclick="toggleCampaignActive()">✕ Close campaign</button>
           <button class="btn-sm primary" onclick="exportReport()">↓ Export PDF</button>
         </div>
@@ -326,13 +353,7 @@
             <div class="panel-header"><div class="panel-title">Alerts</div></div>
             <div id="detail-alerts"><div class="loading"><div class="spinner"></div></div></div>
           </div>
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title">Store link</div></div>
-            <div style="padding:16px 20px">
-              <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Share with store employees to begin installation</div>
-              <div class="link-box"><code id="store-link-code">—</code><button class="link-copy" onclick="copyStoreLink()">Copy</button></div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -384,6 +405,20 @@
 </div>
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<!-- STORE ACTIVITY MODAL -->
+<div class="store-modal-overlay" id="store-activity-modal" onclick="if(event.target===this)closeStoreActivity()">
+  <div class="store-modal-box">
+    <button class="store-modal-close" onclick="closeStoreActivity()">×</button>
+    <div class="store-modal-head">
+      <div class="store-modal-title" id="sam-title">Store</div>
+      <div class="store-modal-meta" id="sam-meta"></div>
+    </div>
+    <div class="store-modal-body" id="sam-body">
+      <div class="store-modal-empty">Loading…</div>
+    </div>
+  </div>
+</div>
 
 <!-- STORE MODAL -->
 <div class="modal-overlay" id="store-modal" onclick="if(event.target===this)closeStoreModal()">
@@ -579,7 +614,6 @@ function openDetail(id){
   document.getElementById('print-title').textContent = p.client;
   document.getElementById('detail-meta').innerHTML = `<span>${esc(p.client)}</span><span>·</span><span>${esc(p.location)}</span><span>·</span><span>${fmtDate(p.created_at)}</span>`;
   document.getElementById('print-meta').textContent = `Execution report · Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;
-  document.getElementById('store-link-code').textContent = storeLink(id);
 
   const pa = alertsFor(id);
   const open = pa.filter(a=>!a.resolved).length;
@@ -745,7 +779,7 @@ async function exportFor(id){
 // ── CREATE ────────────────────────────────────────────
 function openModal(){ document.getElementById('modal').classList.add('open'); setTimeout(()=>document.getElementById('camp-name').focus(),200); }
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeStoreModal(); } });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeStoreModal(); closeStoreActivity(); } });
 
 async function createCampaign(){
   const name = document.getElementById('camp-name').value.trim();
@@ -791,7 +825,6 @@ function switchView(id){
   document.getElementById('topbar-title').textContent = titles[id]||'';
   document.getElementById('nav-'+(id==='detail'?'campaigns':id))?.classList.add('active');
   document.getElementById('btn-export').style.display = id==='detail'?'':'none';
-  document.getElementById('btn-link').style.display = id==='detail'?'':'none';
 }
 
 // ── TOAST + REALTIME POLL ─────────────────────────────
@@ -824,6 +857,81 @@ function signOut() {
   window.location.href = 'login.html';
 }
 
+// ── STORE ACTIVITY MODAL ─────────────────────────────
+function openStoreActivity(storeId) {
+  const store = stores.find(s => s.id === storeId);
+  if (!store) return;
+
+  document.getElementById('sam-title').textContent = store.name;
+  const metaParts = [
+    store.address ? '📍 ' + store.address : null,
+    store.contact_name ? '👤 ' + [store.contact_name, store.contact_phone].filter(Boolean).join(' · ') : null
+  ].filter(Boolean);
+  document.getElementById('sam-meta').innerHTML = metaParts.map(p => `<span>${esc(p)}</span>`).join('');
+
+  // Filter alerts for this store (by installer_name matching store name OR store_id)
+  const storeAlerts = alerts.filter(a =>
+    a.store_id === storeId || a.installer_name === store.name
+  );
+
+  const body = document.getElementById('sam-body');
+
+  if (!storeAlerts.length) {
+    body.innerHTML = '<div class="store-modal-empty">No activity yet for this store.<br><span style="font-size:12px;margin-top:8px;display:block">Share the store link with the installation team to get started.</span></div>';
+  } else {
+    // Separate photo events from regular events
+    const photoAlerts = storeAlerts.filter(a => a.photo_url);
+    const eventAlerts = storeAlerts.filter(a => !a.photo_url);
+
+    let bodyHTML = '';
+
+    // Events section
+    if (eventAlerts.length) {
+      bodyHTML += '<div class="store-modal-section">Activity log</div>';
+      bodyHTML += eventAlerts.map(a => {
+        const done = a.message && a.message.toLowerCase().includes('complete');
+        const err  = a.message && (a.message.toLowerCase().includes('block') || a.message.toLowerCase().includes('missing') || a.message.toLowerCase().includes('denied'));
+        const icon = done ? '✅' : err ? '🚨' : '⚠️';
+        const cls  = done ? 'success' : err ? 'error' : 'warning';
+        const gps  = a.gps_lat ? `<div class="store-event-gps"><a href="https://maps.google.com/?q=${a.gps_lat},${a.gps_lng}" target="_blank">📍 View on map</a></div>` : '';
+        return `<div class="store-event">
+          <div class="store-event-icon ${cls}">${icon}</div>
+          <div class="store-event-body">
+            <div class="store-event-msg">${esc(a.message || '')}</div>
+            <div class="store-event-time">${fmtTime(a.created_at)}</div>
+            ${gps}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Photos section
+    if (photoAlerts.length) {
+      bodyHTML += '<div class="store-modal-section">Photos</div>';
+      bodyHTML += '<div class="photo-grid">' + photoAlerts.map(a =>
+        `<div class="photo-thumb"><img src="${esc(a.photo_url)}" alt="Installation photo" onclick="window.open('${esc(a.photo_url)}','_blank')"></div>`
+      ).join('') + '</div>';
+    }
+
+    body.innerHTML = bodyHTML;
+  }
+
+  // Add copy link button in header meta
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'store-link-copy';
+  copyBtn.style.marginLeft = 'auto';
+  copyBtn.innerHTML = '🔗 Copy link';
+  copyBtn.onclick = () => copyStoreSpecificLink(currentId, storeId);
+  const meta = document.getElementById('sam-meta');
+  meta.appendChild(copyBtn);
+
+  document.getElementById('store-activity-modal').classList.add('open');
+}
+
+function closeStoreActivity() {
+  document.getElementById('store-activity-modal').classList.remove('open');
+}
+
 // ── STORES ───────────────────────────────────────────
 function storesForProject(pid){ return stores.filter(s=>s.project_id===pid); }
 
@@ -843,14 +951,14 @@ function renderDetailStoresList(projectId){
   el.innerHTML = ss.map(s => {
     const link = storeLinkForStore(projectId, s.id);
     const contact = [s.contact_name, s.contact_phone].filter(Boolean).join(' · ');
-    return `<div class="store-list-row">
+    return `<div class="store-list-row" style="cursor:pointer" onclick="openStoreActivity('${s.id}')">
       <div class="store-list-info">
         <div class="store-list-name">${esc(s.name)}</div>
         ${s.address ? `<div class="store-list-addr">📍 ${esc(s.address)}</div>` : ''}
         ${contact ? `<div class="store-list-contact">👤 ${esc(contact)}</div>` : ''}
       </div>
-      <button class="store-link-copy" onclick="copyStoreSpecificLink('${projectId}','${s.id}')">🔗 Copy link</button>
-      <button class="store-delete" onclick="deleteStore('${s.id}')" title="Remove store">×</button>
+      <button class="store-link-copy" onclick="event.stopPropagation();copyStoreSpecificLink('${projectId}','${s.id}')">🔗 Copy link</button>
+      <button class="store-delete" onclick="event.stopPropagation();deleteStore('${s.id}')" title="Remove store">×</button>
     </div>`;
   }).join('');
 }
