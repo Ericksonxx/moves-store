@@ -147,6 +147,18 @@
     .status-pill.alert{background:var(--red-bg);color:var(--red);}
     .status-pill.pending{background:var(--border2);color:var(--muted);}
 
+    /* STORE LIST */
+    .store-list-row{padding:12px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:12px;}
+    .store-list-row:last-child{border-bottom:none;}
+    .store-list-info{flex:1;min-width:0;}
+    .store-list-name{font-size:13px;font-weight:600;color:var(--ink);}
+    .store-list-addr{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .store-list-contact{font-size:11px;color:var(--muted2);}
+    .store-link-copy{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;color:var(--accent2);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;}
+    .store-link-copy:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+    .store-delete{background:none;border:none;cursor:pointer;color:var(--muted2);font-size:16px;padding:2px 6px;line-height:1;transition:color .15s;}
+    .store-delete:hover{color:var(--red);}
+
     /* LINK BOX */
     .link-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:6px;}
     .link-box code{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);flex:1;word-break:break-all;}
@@ -298,8 +310,15 @@
       <div class="detail-grid">
         <div>
           <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Stores</div>
+              <button class="btn-sm primary" onclick="openStoreModal()" style="font-size:12px;padding:5px 12px">＋ Add store</button>
+            </div>
+            <div id="detail-stores-list"><div class="panel-empty">No stores added yet. Add one to generate individual links.</div></div>
+          </div>
+          <div class="panel">
             <div class="panel-header"><div class="panel-title">Store activity</div></div>
-            <div id="detail-stores"><div class="loading"><div class="spinner"></div></div></div>
+            <div id="detail-stores"><div class="panel-empty">No activity yet.</div></div>
           </div>
         </div>
         <div>
@@ -366,6 +385,27 @@
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
+<!-- STORE MODAL -->
+<div class="modal-overlay" id="store-modal" onclick="if(event.target===this)closeStoreModal()">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close-x" onclick="closeStoreModal()">×</button>
+    <div class="modal-title">Add store</div>
+    <div class="modal-sub">This store will get its own installation link.</div>
+    <label class="form-label">Store name *</label>
+    <input class="form-input" id="store-name" placeholder="e.g. El Corte Inglés Castellana">
+    <label class="form-label">Address</label>
+    <input class="form-input" id="store-address" placeholder="Paseo de la Castellana, 42, Madrid">
+    <div class="form-row">
+      <div><label class="form-label">Contact name</label><input class="form-input" id="store-contact-name" placeholder="Ana López"></div>
+      <div><label class="form-label">Contact phone</label><input class="form-input" id="store-contact-phone" placeholder="+34 600 000 000"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm ghost" onclick="closeStoreModal()">Cancel</button>
+      <button class="btn-sm primary" id="store-modal-btn" onclick="createStore()">Add store →</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── AUTH GUARD ────────────────────────────────────────
 const _token = sessionStorage.getItem('sb_token');
@@ -389,7 +429,7 @@ const H = {
 };
 const HP = { ...H, 'Prefer': 'return=representation' }; // use for POST/PATCH
 
-let projects = [], alerts = [], currentId = null;
+let projects = [], alerts = [], stores = [], currentId = null;
 
 async function get(path) {
   const r = await fetch(`${SB}/rest/v1/${path}`, { headers: H });
@@ -441,9 +481,10 @@ async function loadAll(){
     } catch(e){}
   }
   try {
-    [projects, alerts] = await Promise.all([
+    [projects, alerts, stores] = await Promise.all([
       get('projects?type=eq.store&order=created_at.desc'),
-      get('alerts?order=created_at.desc')
+      get('alerts?order=created_at.desc'),
+      get('stores?order=created_at.asc')
     ]);
     renderAll();
   } catch(e) {
@@ -566,6 +607,7 @@ function openDetail(id){
     }
   }
 
+  renderDetailStoresList(id);
   renderDetailStores(id);
   renderDetailAlerts(id);
 }
@@ -703,7 +745,7 @@ async function exportFor(id){
 // ── CREATE ────────────────────────────────────────────
 function openModal(){ document.getElementById('modal').classList.add('open'); setTimeout(()=>document.getElementById('camp-name').focus(),200); }
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeStoreModal(); } });
 
 async function createCampaign(){
   const name = document.getElementById('camp-name').value.trim();
@@ -780,6 +822,90 @@ function signOut() {
   sessionStorage.removeItem('sb_token');
   sessionStorage.removeItem('sb_user');
   window.location.href = 'login.html';
+}
+
+// ── STORES ───────────────────────────────────────────
+function storesForProject(pid){ return stores.filter(s=>s.project_id===pid); }
+
+function storeLinkForStore(projectId, storeId){
+  const base = window.location.href.replace(/dashboard\.html.*/, 'store.html');
+  return `${base}?project=${projectId}&store=${storeId}`;
+}
+
+function renderDetailStoresList(projectId){
+  const el = document.getElementById('detail-stores-list');
+  if(!el) return;
+  const ss = storesForProject(projectId);
+  if(!ss.length){
+    el.innerHTML = '<div class="panel-empty">No stores added yet. Add one to generate individual links.</div>';
+    return;
+  }
+  el.innerHTML = ss.map(s => {
+    const link = storeLinkForStore(projectId, s.id);
+    const contact = [s.contact_name, s.contact_phone].filter(Boolean).join(' · ');
+    return `<div class="store-list-row">
+      <div class="store-list-info">
+        <div class="store-list-name">${esc(s.name)}</div>
+        ${s.address ? `<div class="store-list-addr">📍 ${esc(s.address)}</div>` : ''}
+        ${contact ? `<div class="store-list-contact">👤 ${esc(contact)}</div>` : ''}
+      </div>
+      <button class="store-link-copy" onclick="copyStoreSpecificLink('${projectId}','${s.id}')">🔗 Copy link</button>
+      <button class="store-delete" onclick="deleteStore('${s.id}')" title="Remove store">×</button>
+    </div>`;
+  }).join('');
+}
+
+async function copyStoreSpecificLink(projectId, storeId){
+  const link = storeLinkForStore(projectId, storeId);
+  try { await navigator.clipboard.writeText(link); toast('🔗 Store link copied!'); }
+  catch(e){ prompt('Copy this link:', link); }
+}
+
+function openStoreModal(){
+  if(!currentId){ toast('⚠ Open a campaign first'); return; }
+  ['store-name','store-address','store-contact-name','store-contact-phone'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  document.getElementById('store-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('store-name').focus(), 200);
+}
+function closeStoreModal(){ document.getElementById('store-modal').classList.remove('open'); }
+
+async function createStore(){
+  const name = document.getElementById('store-name').value.trim();
+  if(!name){ document.getElementById('store-name').focus(); return; }
+  const btn = document.getElementById('store-modal-btn');
+  btn.textContent = 'Adding...'; btn.disabled = true;
+
+  const body = {
+    project_id:    currentId,
+    name,
+    address:       document.getElementById('store-address').value.trim() || null,
+    contact_name:  document.getElementById('store-contact-name').value.trim() || null,
+    contact_phone: document.getElementById('store-contact-phone').value.trim() || null
+  };
+
+  try {
+    const data = await post('stores', body);
+    stores.push(data[0]);
+    closeStoreModal();
+    renderDetailStoresList(currentId);
+    toast('✓ Store added — link ready to copy!');
+  } catch(e){ toast('⚠ Error: '+e.message); }
+  btn.textContent = 'Add store →'; btn.disabled = false;
+}
+
+async function deleteStore(storeId){
+  if(!confirm('Remove this store?')) return;
+  try {
+    const r = await fetch(`${SB}/rest/v1/stores?id=eq.${storeId}`, {
+      method:'DELETE', headers:H
+    });
+    if(!r.ok) throw new Error();
+    stores = stores.filter(s=>s.id!==storeId);
+    renderDetailStoresList(currentId);
+    toast('Store removed');
+  } catch(e){ toast('⚠ Could not remove store'); }
 }
 
 loadAll();

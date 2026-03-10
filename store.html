@@ -313,22 +313,40 @@ navigator.geolocation?.getCurrentPosition(pos => {
 // Init
 window.addEventListener('load', async () => {
   const params = new URLSearchParams(location.search);
-  const id = params.get('project') || 'store1234';
+  const id      = params.get('project') || 'store1234';
+  const storeId = params.get('store') || null;
 
   if (DEMO[id]) {
     project = DEMO[id];
   } else {
     try {
+      // Load project
       const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}&select=*`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       });
       const data = await res.json();
+
+      // Load store name if storeId present
+      let storeName = null;
+      let storeAddress = null;
+      if (storeId) {
+        try {
+          const sr = await fetch(`${SUPABASE_URL}/rest/v1/stores?id=eq.${storeId}&select=name,address`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+          });
+          const sd = await sr.json();
+          if (sd[0]) { storeName = sd[0].name; storeAddress = sd[0].address; }
+        } catch(e){}
+      }
+
       if (data[0]) {
         const p = data[0];
         project = {
           name: p.name || 'Installation',
           brand: p.client || 'Brand',
-          store: p.location || 'Store',
+          store: storeName || p.location || 'Store',
+          storeId: storeId,
+          storeAddress: storeAddress,
           pm_email: p.pm_email || 'hello@moveops.services',
           steps: [
             { id:'s1', title:'Before photo', desc:'Photo of the space before installation', type:'photo', refImage:null },
@@ -590,6 +608,7 @@ async function finishInstallation() {
         type: 'store',
         message: `Installation complete — ${project.store}`,
         installer_name: project.store,
+        store_id: project.storeId || null,
         gps_lat: gpsCoords?.lat || null,
         gps_lng: gpsCoords?.lng || null,
         pm_email: project.pm_email
