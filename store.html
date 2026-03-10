@@ -613,6 +613,7 @@ async function finishInstallation() {
         type: 'store',
         message: `Installation complete — ${project.store}`,
         installer_name: project.store,
+        sent_by: project.store,
         store_id: project.storeId || null,
         gps_lat: gpsCoords?.lat || null,
         gps_lng: gpsCoords?.lng || null,
@@ -651,6 +652,7 @@ async function sendAlert() {
         type: 'store',
         message: `[${type.toUpperCase()}] ${msg || 'No details provided'} — ${project?.store}`,
         installer_name: project?.store || 'Store',
+        sent_by: project?.store || 'Store',
         gps_lat: gpsCoords?.lat || null,
         gps_lng: gpsCoords?.lng || null,
         pm_email: project?.pm_email || 'hello@moveops.services'

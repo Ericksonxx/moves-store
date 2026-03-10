@@ -490,13 +490,13 @@ function fmtTime(iso){
   return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 }
 function alertsFor(id){ return alerts.filter(a=>a.project_id===id); }
-function openFor(id){ return alertsFor(id).filter(a=>!a.resolved); }
+function openFor(id){ return alertsFor(id).filter(a=>a.status!=='resolved'); }
 function storeLink(id){
   const base = window.location.href.replace(/dashboard\.html.*/, 'store.html');
   return `${base}?project=${id}`;
 }
 function updateBadge(){
-  const n = alerts.filter(a=>!a.resolved).length;
+  const n = alerts.filter(a=>a.status!=='resolved').length;
   const b = document.getElementById('alert-badge');
   b.textContent = n; b.style.display = n>0 ? '' : 'none';
 }
@@ -541,7 +541,7 @@ function renderOverview(){
   document.getElementById('stat-active').textContent = projects.filter(p=>p.active).length;
   document.getElementById('stat-total').textContent = projects.length;
   document.getElementById('stat-events').textContent = alerts.length;
-  document.getElementById('stat-open').textContent = alerts.filter(a=>!a.resolved).length;
+  document.getElementById('stat-open').textContent = alerts.filter(a=>a.status!=='resolved').length;
 
   const ce = document.getElementById('ov-campaigns');
   ce.innerHTML = !projects.length ? '<div class="panel-empty">No campaigns yet.</div>'
@@ -616,7 +616,7 @@ function openDetail(id){
   document.getElementById('print-meta').textContent = `Execution report · Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;
 
   const pa = alertsFor(id);
-  const open = pa.filter(a=>!a.resolved).length;
+  const open = pa.filter(a=>a.status!=='resolved').length;
   const completions = pa.filter(a=>a.message&&a.message.toLowerCase().includes('complete')).length;
   const stores = [...new Set(pa.map(a=>a.installer_name).filter(Boolean))].length;
 
@@ -673,7 +673,7 @@ function renderDetailStores(id){
   // Group by store
   const byStore = {};
   pa.forEach(a => {
-    const k = a.installer_name || 'Unknown';
+    const k = a.sent_by || a.installer_name || 'Unknown';
     if(!byStore[k]) byStore[k]=[];
     byStore[k].push(a);
   });
@@ -706,8 +706,8 @@ function renderDetailAlerts(id){
 
 // ── ALERTS VIEW ──────────────────────────────────────
 function renderAlertViews(){
-  const open = alerts.filter(a=>!a.resolved);
-  const resolved = alerts.filter(a=>a.resolved);
+  const open = alerts.filter(a=>a.status!=='resolved');
+  const resolved = alerts.filter(a=>a.status==='resolved');
   document.getElementById('alerts-open').innerHTML = open.length ? open.map(a=>alertHTML(a)).join('') : '<div class="panel-empty">No open alerts 🎉</div>';
   document.getElementById('alerts-resolved').innerHTML = resolved.length ? resolved.map(a=>`<div style="opacity:.5">${alertHTML(a)}</div>`).join('') : '<div class="panel-empty">None yet.</div>';
 }
@@ -722,7 +722,7 @@ function alertHTML(a){
   return `<div class="alert-item" id="al-${a.id}">
     <div class="alert-icon ${cls}">${icon}</div>
     <div class="alert-body">
-      <div class="alert-title">${esc(a.installer_name||'Store')}</div>
+      <div class="alert-title">${esc(a.sent_by||a.installer_name||'Store')}</div>
       <div class="alert-desc">${esc(a.message||'')}</div>
       ${gps}${resolve}
     </div>
@@ -734,8 +734,8 @@ async function resolveAlert(id){
   const el = document.getElementById('al-'+id);
   if(el){ el.style.opacity='.4'; el.style.pointerEvents='none'; }
   try {
-    await patch(`alerts?id=eq.${id}`, { resolved: true });
-    alerts = alerts.map(a => a.id===id ? {...a,resolved:true} : a);
+    await patch(`alerts?id=eq.${id}`, { status: 'resolved' });
+    alerts = alerts.map(a => a.id===id ? {...a,status:'resolved'} : a);
     updateBadge();
     renderAlertViews();
     if(currentId) renderDetailAlerts(currentId);
@@ -839,13 +839,13 @@ setInterval(async()=>{
   try {
     const fresh = await get('alerts?order=created_at.desc');
     if(JSON.stringify(fresh)!==JSON.stringify(alerts)){
-      const wasOpen = alerts.filter(a=>!a.resolved).length;
+      const wasOpen = alerts.filter(a=>a.status!=='resolved').length;
       alerts = fresh;
       updateBadge();
       renderAlertViews();
       if(currentId){ renderDetailAlerts(currentId); renderDetailStores(currentId); }
       renderOverview();
-      const nowOpen = alerts.filter(a=>!a.resolved).length;
+      const nowOpen = alerts.filter(a=>a.status!=='resolved').length;
       if(nowOpen > wasOpen) toast('🔔 New alert received');
     }
   } catch(e){}
@@ -870,8 +870,11 @@ function openStoreActivity(storeId) {
   document.getElementById('sam-meta').innerHTML = metaParts.map(p => `<span>${esc(p)}</span>`).join('');
 
   // Filter alerts for this store (by installer_name matching store name OR store_id)
+  const storeName = store.name;
   const storeAlerts = alerts.filter(a =>
-    a.store_id === storeId || a.installer_name === store.name
+    a.store_id === storeId ||
+    (a.sent_by && a.sent_by === storeName) ||
+    (a.installer_name && a.installer_name === storeName)
   );
 
   const body = document.getElementById('sam-body');
