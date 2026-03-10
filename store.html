@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1A3A2A">
+  <title>MoveOps Store — Installation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent:   #1A3A2A;
+      --accent2:  #2D6048;
+      --green:    #4CAF82;
+      --gold:     #C9A84C;
+      --red:      #C0392B;
+      --ink:      #0D0D0D;
+      --bg:       #F5F2ED;
+      --white:    #FAFAF8;
+      --border:   #E2DED7;
+      --muted:    #888880;
+    }
+    html, body { height: 100%; background: var(--bg); overflow: hidden; }
+    body { font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; }
+
+    /* ── SCREENS ── */
+    .screen { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+    .screen.active { display: flex; }
+
+    /* ── IDENTIFY SCREEN ── */
+    .id-screen { background: var(--accent); }
+    .id-top { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 32px 32px; text-align: center; }
+    .id-logo { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 4px; color: rgba(255,255,255,0.4); margin-bottom: 48px; text-transform: uppercase; }
+    .id-icon { width: 72px; height: 72px; border-radius: 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px; }
+    .id-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+    .id-brand { font-family: 'DM Mono', monospace; font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 8px; }
+    .id-store { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.75); }
+    .id-bottom { background: var(--white); border-radius: 24px 24px 0 0; padding: 28px 24px 40px; }
+    .id-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .id-steps-preview { display: flex; gap: 8px; margin-bottom: 24px; }
+    .id-step-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
+    .id-step-dot:first-child { background: var(--accent2); }
+    .id-gps { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 24px; background: rgba(26,58,42,0.05); padding: 10px 14px; border-radius: 8px; }
+    .id-gps-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: blink 2s ease infinite; flex-shrink: 0; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .btn-start { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+    .btn-start:hover { background: var(--accent2); }
+
+    /* ── MAIN SCREEN ── */
+    .main-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 20px; flex-shrink: 0; }
+    .main-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .header-logo { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+    .header-alert-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .header-alert-btn:hover { border-color: var(--red); color: var(--red); }
+    .progress-section {}
+    .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .progress-label span { font-size: 12px; color: var(--muted); }
+    .progress-label strong { font-size: 12px; color: var(--accent2); font-weight: 700; }
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent2); border-radius: 3px; transition: width 0.5s ease; }
+    .progress-steps-row { display: flex; gap: 4px; margin-top: 8px; }
+    .progress-step-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+    .progress-step-dot.done { background: var(--green); }
+    .progress-step-dot.current { background: var(--accent2); }
+
+    .main-content { flex: 1; padding: 20px 20px 100px; overflow-y: auto; }
+    .main-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); padding: 14px 20px; safe-area-inset-bottom: env(safe-area-inset-bottom); }
+
+    /* ── STEP CARD ── */
+    .step-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; transition: opacity 0.3s, transform 0.3s; }
+    .step-card.locked { opacity: 0.45; pointer-events: none; }
+    .step-card.done-card { opacity: 0.6; }
+    .step-card.active-card { border-color: var(--accent2); box-shadow: 0 2px 16px rgba(26,58,42,0.1); }
+
+    .step-header { padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+    .step-num-badge { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+    .step-num-badge.pending { background: var(--bg); color: var(--muted); }
+    .step-num-badge.active { background: var(--accent); color: #fff; }
+    .step-num-badge.complete { background: var(--green); color: #fff; font-size: 14px; }
+    .step-info { flex: 1; }
+    .step-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .step-type-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); margin-top: 4px; }
+
+    .step-body { padding: 0 18px 18px; border-top: 1px solid var(--border); }
+
+    /* photo capture */
+    .photo-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .photo-zone:hover { border-color: var(--accent2); background: rgba(26,58,42,0.02); }
+    .photo-zone.has-photo { border-style: solid; border-color: var(--green); background: rgba(76,175,130,0.04); }
+    .photo-zone-icon { font-size: 28px; margin-bottom: 8px; }
+    .photo-zone-label { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .photo-zone-sub { font-size: 12px; color: var(--muted); }
+    .photo-preview { width: 100%; border-radius: 8px; margin-top: 10px; display: none; }
+    .photo-preview.show { display: block; }
+    .photo-gps-tag { display: inline-flex; align-items: center; gap: 5px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent2); background: var(--bg); padding: 4px 8px; border-radius: 5px; margin-top: 6px; }
+    .photo-gps-tag.hidden { display: none; }
+
+    /* ── CAMERA OVERLAY ── */
+    .camera-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: #000; flex-direction: column; }
+    .camera-overlay.open { display: flex; }
+    #camera-video { flex: 1; width: 100%; object-fit: cover; display: block; }
+    .camera-bar { background: rgba(0,0,0,0.7); padding: 16px 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .camera-cancel { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 14px; font-weight: 600; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .camera-shutter { width: 68px; height: 68px; border-radius: 50%; background: #fff; border: 4px solid rgba(255,255,255,0.4); cursor: pointer; transition: transform 0.1s; flex-shrink: 0; }
+    .camera-shutter:active { transform: scale(0.92); }
+    .camera-flip { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; padding: 12px 16px; border-radius: 10px; cursor: pointer; }
+    .camera-ref-thumb { position: absolute; top: 16px; left: 16px; width: 96px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 10; cursor: pointer; }
+    .camera-ref-thumb img { width: 100%; height: 72px; object-fit: cover; display: block; }
+    .camera-ref-label { background: rgba(0,0,0,0.7); color: #fff; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 6px; text-align: center; }
+    .camera-ref-expanded { display: none; position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+    .camera-ref-expanded.open { display: flex; }
+    .camera-ref-expanded img { max-width: 90%; max-height: 80vh; border-radius: 12px; object-fit: contain; }
+    .camera-ref-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 22px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    /* checklist */
+    .checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .check-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg); border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+    .check-item:hover { background: #ede9e3; }
+    .check-item.checked { background: rgba(76,175,130,0.08); }
+    .check-box { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .check-item.checked .check-box { background: var(--green); border-color: var(--green); color: #fff; font-size: 12px; }
+    .check-text { font-size: 14px; color: var(--ink); font-weight: 500; }
+    .check-item.checked .check-text { text-decoration: line-through; color: var(--muted); }
+
+    /* confirm button */
+    .btn-confirm { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 14px; }
+    .btn-confirm:hover { background: var(--accent2); }
+    .btn-confirm:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+    /* main footer btn */
+    .btn-main { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+    .btn-main:hover { background: var(--accent2); }
+    .btn-main:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+    /* ── ALERT SCREEN ── */
+    .alert-screen { background: var(--white); }
+    .alert-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; padding: 4px; }
+    .alert-header-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .alert-body { padding: 24px 20px; flex: 1; }
+    .alert-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .alert-option { padding: 14px 16px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 10px; }
+    .alert-option:hover { border-color: var(--red); color: var(--red); }
+    .alert-option.selected { border-color: var(--red); background: rgba(192,57,43,0.05); color: var(--red); }
+    .alert-textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; resize: none; transition: border-color 0.2s; margin-bottom: 16px; }
+    .alert-textarea:focus { border-color: var(--accent2); }
+    .btn-alert-send { width: 100%; padding: 15px; background: var(--red); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+    /* ── DONE SCREEN ── */
+    .done-screen { background: var(--accent); align-items: center; justify-content: center; text-align: center; padding: 48px 32px; }
+    .done-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 28px; }
+    .done-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .done-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 40px; line-height: 1.6; max-width: 300px; margin-left: auto; margin-right: auto; }
+    .done-summary { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; width: 100%; max-width: 320px; margin: 0 auto 32px; text-align: left; }
+    .done-summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 13px; }
+    .done-summary-row:last-child { border-bottom: none; }
+    .done-summary-row span { color: rgba(255,255,255,0.45); }
+    .done-summary-row strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; white-space: nowrap; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 200; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- IDENTIFY SCREEN -->
+<div class="screen active" id="screen-identify">
+  <div class="id-screen" style="display:flex;flex-direction:column;flex:1">
+    <div class="id-top">
+      <div class="id-logo">MoveOps Store</div>
+      <div class="id-icon">🏪</div>
+      <div class="id-brand" id="id-brand-name">Nike · SS26 Campaign</div>
+      <div class="id-title" id="id-title">Primavera Window Installation</div>
+      <div class="id-store" id="id-store-name">Loading store info...</div>
+    </div>
+    <div class="id-bottom">
+      <div class="id-label">Installation steps</div>
+      <div class="id-steps-preview" id="id-steps-preview"></div>
+      <div class="id-gps">
+        <div class="id-gps-dot"></div>
+        <span>GPS location will be captured with each photo</span>
+      </div>
+      <button class="btn-start" onclick="startInstallation()">Start installation →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div class="screen" id="screen-main">
+  <div class="main-header">
+    <div class="main-header-top">
+      <span class="header-logo">MoveOps Store</span>
+      <button class="header-alert-btn" onclick="showAlert()">⚠ Report problem</button>
+    </div>
+    <div class="progress-section">
+      <div class="progress-label">
+        <span id="progress-text">Step 1 of 4</span>
+        <strong id="progress-pct">0%</strong>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-steps-row" id="progress-dots"></div>
+    </div>
+  </div>
+
+  <div class="main-content" id="steps-container"></div>
+
+  <div class="main-footer">
+    <button class="btn-main" id="btn-next" onclick="nextStep()">Complete step →</button>
+  </div>
+</div>
+
+<!-- ALERT SCREEN -->
+<div class="screen" id="screen-alert">
+  <div class="alert-header">
+    <button class="back-btn" onclick="showScreen('main')">←</button>
+    <div class="alert-header-title">Report a problem</div>
+  </div>
+  <div class="alert-body">
+    <div class="id-label" style="margin-bottom:12px">What's the issue?</div>
+    <div class="alert-options">
+      <div class="alert-option" onclick="selectAlertType(this, 'missing')">📦 Material missing or incomplete</div>
+      <div class="alert-option" onclick="selectAlertType(this, 'damaged')">💥 Material arrived damaged</div>
+      <div class="alert-option" onclick="selectAlertType(this, 'access')">🚫 Cannot access installation area</div>
+      <div class="alert-option" onclick="selectAlertType(this, 'other')">💬 Other issue</div>
+    </div>
+    <div class="id-label" style="margin-bottom:8px">Details (optional)</div>
+    <textarea class="alert-textarea" rows="4" placeholder="Describe the problem..." id="alert-text"></textarea>
+    <button class="btn-alert-send" onclick="sendAlert()">Send alert to brand team</button>
+  </div>
+</div>
+
+<!-- DONE SCREEN -->
+<div class="screen" id="screen-done">
+  <div class="done-screen" style="display:flex;flex-direction:column;flex:1">
+    <div class="done-icon">✓</div>
+    <div class="done-title">Installation complete!</div>
+    <div class="done-sub">All steps are done. The brand team has been notified and your photos are saved.</div>
+    <div class="done-summary" id="done-summary"></div>
+    <div style="color:rgba(255,255,255,0.35);font-size:12px">You can close this window.</div>
+  </div>
+</div>
+
+
+<!-- CAMERA OVERLAY -->
+<div class="camera-overlay" id="camera-overlay">
+  <video id="camera-video" autoplay playsinline muted></video>
+  <!-- Reference thumbnail (only if step has refImage) -->
+  <div class="camera-ref-thumb" id="camera-ref-thumb" style="display:none" onclick="expandRef()">
+    <img id="camera-ref-img" src="" alt="Reference">
+    <div class="camera-ref-label">Reference</div>
+  </div>
+  <!-- Expanded reference -->
+  <div class="camera-ref-expanded" id="camera-ref-expanded" onclick="collapseRef()">
+    <img id="camera-ref-expanded-img" src="" alt="Reference">
+    <button class="camera-ref-close" onclick="collapseRef()">×</button>
+  </div>
+  <canvas id="camera-canvas" style="display:none"></canvas>
+  <div class="camera-bar">
+    <button class="camera-cancel" onclick="closeCamera()">Cancel</button>
+    <button class="camera-shutter" id="camera-shutter" onclick="capturePhoto()"></button>
+    <button class="camera-flip" onclick="flipCamera()">🔄</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ysltwsexfeweqjmzdahs.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzbHR3c2V4ZmV3ZXFqbXpkYWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjI4MjYsImV4cCI6MjA4ODYzODgyNn0.pgABlsoHBq9LkOqtJhXd-LF7XKMla_fgR1CbWAWpl_k';
+
+const DEMO = {
+  'store1234': {
+    name: 'Primavera Window Installation',
+    brand: 'Nike · SS26 Campaign',
+    store: 'El Corte Inglés Sevilla',
+    pm_email: 'hello@moveops.services',
+    steps: [
+      { id:'s1', title:'Before photo', desc:'Photo of the installation area before starting', type:'photo', refImage:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=60' },
+      { id:'s2', title:'Confirm materials received', desc:'Check off all items in the shipment', type:'checklist', items:['Lateral panels x2','Central display','Vinyl stickers x10','Floor stand'] },
+      { id:'s3', title:'Display installed', desc:'Photo of the display in its final position', type:'photo', refImage:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=60' },
+      { id:'s4', title:'Final result', desc:'Wide photo of the complete installation', type:'photo', refImage:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=60' },
+    ]
+  },
+  'store5678': {
+    name: 'Air Max PLV Installation',
+    brand: 'Nike · Air Max Day',
+    store: 'Foot Locker Barcelona',
+    pm_email: 'hello@moveops.services',
+    steps: [
+      { id:'s1', title:'Before photo', desc:'Space before installation begins', type:'photo', refImage:null },
+      { id:'s2', title:'Material check', desc:'Confirm all PLV elements received', type:'checklist', items:['PLV banner x1','Stoppers x4','Price strips','Header card'] },
+      { id:'s3', title:'Installed', desc:'Photo of completed installation', type:'photo', refImage:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=60' },
+    ]
+  }
+};
+
+let project = null;
+let currentStepIndex = 0;
+let stepStates = [];
+let gpsCoords = null;
+let alertType = null;
+
+// Get GPS
+navigator.geolocation?.getCurrentPosition(pos => {
+  gpsCoords = { lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) };
+}, () => {});
+
+// Init
+window.addEventListener('load', async () => {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('project') || 'store1234';
+
+  if (DEMO[id]) {
+    project = DEMO[id];
+  } else {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}&select=*`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if (data[0]) {
+        const p = data[0];
+        project = {
+          name: p.name || 'Installation',
+          brand: p.client || 'Brand',
+          store: p.location || 'Store',
+          pm_email: p.pm_email || 'hello@moveops.services',
+          steps: [
+            { id:'s1', title:'Before photo', desc:'Photo of the space before installation', type:'photo', refImage:null },
+            { id:'s2', title:'Materials confirmed', desc:'All items received and checked', type:'checklist', items:['Main material','Fixings','Instructions'] },
+            { id:'s3', title:'Installation complete', desc:'Photo of the final result', type:'photo', refImage:null },
+          ]
+        };
+      }
+    } catch(e) {}
+    if (!project) project = DEMO['store1234'];
+  }
+
+  stepStates = project.steps.map(() => ({ done: false, photo: null, checklist: [] }));
+
+  // Populate identify screen
+  document.getElementById('id-brand-name').textContent = project.brand;
+  document.getElementById('id-title').textContent = project.name;
+  document.getElementById('id-store-name').textContent = project.store;
+  const preview = document.getElementById('id-steps-preview');
+  project.steps.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'id-step-dot';
+    if (i === 0) d.style.background = 'var(--accent2)';
+    preview.appendChild(d);
+  });
+});
+
+function startInstallation() {
+  showScreen('main');
+  renderSteps();
+  updateProgress();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function renderSteps() {
+  const container = document.getElementById('steps-container');
+  container.innerHTML = '';
+
+  // Progress dots
+  const dotsContainer = document.getElementById('progress-dots');
+  dotsContainer.innerHTML = '';
+  project.steps.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'progress-step-dot' + (stepStates[i].done ? ' done' : i === currentStepIndex ? ' current' : '');
+    dotsContainer.appendChild(d);
+  });
+
+  project.steps.forEach((step, i) => {
+    const state = stepStates[i];
+    const isActive = i === currentStepIndex;
+    const isDone = state.done;
+    const isLocked = i > currentStepIndex;
+
+    const card = document.createElement('div');
+    card.className = 'step-card' + (isLocked ? ' locked' : isDone ? ' done-card' : isActive ? ' active-card' : '');
+    card.id = 'step-card-' + i;
+
+    const numIcon = isDone ? '✓' : (i + 1);
+    const numClass = isDone ? 'complete' : isActive ? 'active' : 'pending';
+
+    let bodyHTML = '';
+    if (isActive || isDone) {
+      bodyHTML = `<div class="step-body">`;
+
+      if (step.type === 'photo') {
+        const hasPhoto = state.photo;
+        bodyHTML += `
+          <div class="photo-zone ${hasPhoto ? 'has-photo' : ''}" id="zone-${i}" onclick="openCamera(${i})">
+            <div class="photo-zone-icon">${hasPhoto ? '✅' : '📸'}</div>
+            <div class="photo-zone-label">${hasPhoto ? 'Photo taken — tap to retake' : 'Tap to open camera'}</div>
+            <div class="photo-zone-sub">${hasPhoto ? '' : 'Camera opens full screen'}</div>
+          </div>
+          ${hasPhoto ? `<img src="${hasPhoto}" class="photo-preview show" style="max-height:200px;object-fit:cover;border-radius:8px;margin-top:10px">` : ''}
+          <div class="photo-gps-tag ${gpsCoords && hasPhoto ? '' : 'hidden'}" id="gps-tag-${i}">📍 GPS: ${gpsCoords?.lat}, ${gpsCoords?.lng}</div>
+        `;
+      } else if (step.type === 'checklist') {
+        bodyHTML += `<div class="checklist" id="checklist-${i}">`;
+        step.items.forEach((item, j) => {
+          const checked = state.checklist[j];
+          bodyHTML += `
+            <div class="check-item ${checked ? 'checked' : ''}" onclick="toggleCheck(${i}, ${j})">
+              <div class="check-box">${checked ? '✓' : ''}</div>
+              <div class="check-text">${item}</div>
+            </div>`;
+        });
+        bodyHTML += `</div>`;
+      }
+
+      if (!isDone) {
+        bodyHTML += `<button class="btn-confirm" id="confirm-btn-${i}" onclick="confirmStep(${i})" ${canConfirm(i) ? '' : 'disabled'}>Confirm step ✓</button>`;
+      }
+
+      bodyHTML += `</div>`;
+    }
+
+    card.innerHTML = `
+      <div class="step-header">
+        <div class="step-num-badge ${numClass}">${numIcon}</div>
+        <div class="step-info">
+          <div class="step-title">${step.title}</div>
+          <div class="step-desc">${step.desc}</div>
+          <div class="step-type-tag">${step.type === 'photo' ? '📸 Photo required' : '☑ Checklist'}</div>
+        </div>
+      </div>
+      ${bodyHTML}
+    `;
+    container.appendChild(card);
+  });
+
+  updateNextBtn();
+}
+
+function canConfirm(i) {
+  const step = project.steps[i];
+  const state = stepStates[i];
+  if (step.type === 'photo') return !!state.photo;
+  if (step.type === 'checklist') return step.items.every((_, j) => state.checklist[j]);
+  return true;
+}
+
+// ── CAMERA ──
+let cameraStepIndex = null;
+let cameraStream = null;
+let facingMode = 'environment';
+
+async function openCamera(i) {
+  cameraStepIndex = i;
+  const step = project.steps[i];
+  const overlay = document.getElementById('camera-overlay');
+  const thumb = document.getElementById('camera-ref-thumb');
+  const refImg = document.getElementById('camera-ref-img');
+  const expandedImg = document.getElementById('camera-ref-expanded-img');
+
+  // Set reference image if available
+  if (step.refImage) {
+    refImg.src = step.refImage;
+    expandedImg.src = step.refImage;
+    thumb.style.display = 'block';
+  } else {
+    thumb.style.display = 'none';
+  }
+
+  overlay.classList.add('open');
+  await startCameraStream();
+}
+
+async function startCameraStream() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+    document.getElementById('camera-video').srcObject = cameraStream;
+  } catch(e) {
+    closeCamera();
+    showToast('Camera not available');
+  }
+}
+
+async function flipCamera() {
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  await startCameraStream();
+}
+
+function closeCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  document.getElementById('camera-overlay').classList.remove('open');
+  document.getElementById('camera-ref-expanded').classList.remove('open');
+  cameraStepIndex = null;
+}
+
+function capturePhoto() {
+  const video = document.getElementById('camera-video');
+  const canvas = document.getElementById('camera-canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  const i = cameraStepIndex;
+  closeCamera();
+  stepStates[i].photo = dataUrl;
+  renderSteps();
+  showToast('📍 Photo saved with GPS tag');
+}
+
+function expandRef() {
+  document.getElementById('camera-ref-expanded').classList.add('open');
+}
+function collapseRef(e) {
+  document.getElementById('camera-ref-expanded').classList.remove('open');
+}
+
+function handlePhoto(i, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    stepStates[i].photo = e.target.result;
+    renderSteps();
+    showToast('📍 Photo saved with GPS tag');
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleCheck(i, j) {
+  stepStates[i].checklist[j] = !stepStates[i].checklist[j];
+  renderSteps();
+}
+
+function confirmStep(i) {
+  if (!canConfirm(i)) return;
+  stepStates[i].done = true;
+  if (i < project.steps.length - 1) {
+    currentStepIndex = i + 1;
+    renderSteps();
+    updateProgress();
+    showToast('✓ Step complete!');
+    setTimeout(() => {
+      document.getElementById('step-card-' + (i + 1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  } else {
+    updateProgress();
+    renderSteps();
+    setTimeout(() => finishInstallation(), 600);
+  }
+}
+
+function nextStep() { confirmStep(currentStepIndex); }
+
+function updateNextBtn() {
+  const btn = document.getElementById('btn-next');
+  const allDone = stepStates.every(s => s.done);
+  if (allDone) { btn.textContent = '✓ All done'; btn.disabled = false; return; }
+  btn.disabled = !canConfirm(currentStepIndex);
+  btn.textContent = currentStepIndex === project.steps.length - 1 ? 'Complete installation ✓' : 'Complete step →';
+}
+
+function updateProgress() {
+  const done = stepStates.filter(s => s.done).length;
+  const total = project.steps.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-text').textContent = `Step ${Math.min(done + 1, total)} of ${total}`;
+}
+
+async function finishInstallation() {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({
+        project_id: new URLSearchParams(location.search).get('project') || 'store1234',
+        type: 'store',
+        message: `Installation complete — ${project.store}`,
+        installer_name: project.store,
+        gps_lat: gpsCoords?.lat || null,
+        gps_lng: gpsCoords?.lng || null,
+        pm_email: project.pm_email
+      })
+    });
+  } catch(e) {}
+
+  const photoCount = stepStates.filter(s => s.photo).length;
+  document.getElementById('done-summary').innerHTML = `
+    <div class="done-summary-row"><span>Store</span><strong>${project.store}</strong></div>
+    <div class="done-summary-row"><span>Campaign</span><strong>${project.name}</strong></div>
+    <div class="done-summary-row"><span>Steps completed</span><strong>${project.steps.length} / ${project.steps.length}</strong></div>
+    <div class="done-summary-row"><span>Photos uploaded</span><strong>${photoCount}</strong></div>
+    <div class="done-summary-row"><span>GPS verified</span><strong>${gpsCoords ? '✓ Yes' : 'Not available'}</strong></div>
+  `;
+  showScreen('done');
+}
+
+// Alert
+function showAlert() { showScreen('alert'); }
+function selectAlertType(el, type) {
+  document.querySelectorAll('.alert-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  alertType = type;
+}
+async function sendAlert() {
+  const msg = document.getElementById('alert-text').value.trim();
+  const type = alertType || 'other';
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({
+        project_id: new URLSearchParams(location.search).get('project') || 'store1234',
+        type: 'store',
+        message: `[${type.toUpperCase()}] ${msg || 'No details provided'} — ${project?.store}`,
+        installer_name: project?.store || 'Store',
+        gps_lat: gpsCoords?.lat || null,
+        gps_lng: gpsCoords?.lng || null,
+        pm_email: project?.pm_email || 'hello@moveops.services'
+      })
+    });
+  } catch(e) {}
+  showScreen('main');
+  showToast('⚠ Alert sent to brand team');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
