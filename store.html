@@ -528,6 +528,41 @@ function closeCamera() {
   cameraStepIndex = null;
 }
 
+async function uploadPhotoToStorage(dataUrl, stepIndex) {
+  try {
+    // Convert dataUrl to blob
+    const res  = await fetch(dataUrl);
+    const blob = await res.blob();
+    const ext  = 'jpg';
+    const projectId = new URLSearchParams(location.search).get('project') || 'store1234';
+    const storeId   = new URLSearchParams(location.search).get('store') || 'unknown';
+    const filename  = `${projectId}/${storeId}/step${stepIndex+1}_${Date.now()}.${ext}`;
+
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/photos/${filename}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'image/jpeg',
+        'x-upsert': 'true'
+      },
+      body: blob
+    });
+
+    if (!r.ok) {
+      const err = await r.text();
+      console.warn('Photo upload failed:', err);
+      return null;
+    }
+
+    // Return public URL
+    return `${SUPABASE_URL}/storage/v1/object/public/photos/${filename}`;
+  } catch(e) {
+    console.warn('Photo upload error:', e);
+    return null;
+  }
+}
+
 function capturePhoto() {
   const video = document.getElementById('camera-video');
   const canvas = document.getElementById('camera-canvas');
@@ -539,7 +574,35 @@ function capturePhoto() {
   closeCamera();
   stepStates[i].photo = dataUrl;
   renderSteps();
-  showToast('📍 Photo saved with GPS tag');
+  showToast('📍 Uploading photo…');
+
+  // Upload to Supabase Storage in background
+  uploadPhotoToStorage(dataUrl, i).then(url => {
+    if (url) {
+      stepStates[i].photoUrl = url;
+      showToast('✓ Photo saved');
+      // Post photo alert to dashboard
+      const projectId = new URLSearchParams(location.search).get('project') || 'store1234';
+      fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
+        body: JSON.stringify({
+          project_id: projectId,
+          type: 'photo',
+          message: `Photo: ${project?.steps?.[i]?.title || 'Step ' + (i+1)}`,
+          sent_by: project?.store || 'Store',
+          installer_name: project?.store || 'Store',
+          store_id: project?.storeId || null,
+          photo_url: url,
+          gps_lat: gpsCoords?.lat || null,
+          gps_lng: gpsCoords?.lng || null,
+          pm_email: project?.pm_email || 'hello@moveops.services'
+        })
+      }).catch(e => console.warn('Photo alert failed:', e));
+    } else {
+      showToast('⚠ Photo saved locally only');
+    }
+  });
 }
 
 function expandRef() {
@@ -554,9 +617,33 @@ function handlePhoto(i, input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    stepStates[i].photo = e.target.result;
+    const dataUrl = e.target.result;
+    stepStates[i].photo = dataUrl;
     renderSteps();
-    showToast('📍 Photo saved with GPS tag');
+    showToast('📍 Uploading photo…');
+    uploadPhotoToStorage(dataUrl, i).then(url => {
+      if (url) {
+        stepStates[i].photoUrl = url;
+        showToast('✓ Photo saved');
+        const projectId = new URLSearchParams(location.search).get('project') || 'store1234';
+        fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify({
+            project_id: projectId,
+            type: 'photo',
+            message: `Photo: ${project?.steps?.[i]?.title || 'Step ' + (i+1)}`,
+            sent_by: project?.store || 'Store',
+            installer_name: project?.store || 'Store',
+            store_id: project?.storeId || null,
+            photo_url: url,
+            gps_lat: gpsCoords?.lat || null,
+            gps_lng: gpsCoords?.lng || null,
+            pm_email: project?.pm_email || 'hello@moveops.services'
+          })
+        }).catch(e => console.warn('Photo alert failed:', e));
+      }
+    });
   };
   reader.readAsDataURL(file);
 }
