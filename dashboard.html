@@ -241,7 +241,43 @@
       .print-header{display:block!important;}
       .stat-card.accent-card{background:var(--accent)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     }
-    .print-header{display:none;padding:0 0 24px;border-bottom:2px solid var(--accent);margin-bottom:24px;}
+    /* MATERIALS */
+    .mat-section { margin-top: 16px; }
+    .mat-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border2); }
+    .mat-row:last-child { border-bottom: none; }
+    .mat-row-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--ink); }
+    .mat-row-unit { font-size: 12px; color: var(--muted); width: 60px; text-align: right; }
+    .mat-row-qty { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent2); width: 40px; text-align: center; }
+    .mat-del { background: none; border: none; cursor: pointer; color: var(--muted2); font-size: 16px; padding: 2px 6px; transition: color .15s; }
+    .mat-del:hover { color: var(--red); }
+    .mat-add-row { display: flex; gap: 8px; padding: 10px 14px; }
+    .mat-add-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 8px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; }
+    .mat-add-btn { background: var(--accent); color: #fff; border: none; border-radius: 7px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .mat-qty-input { width: 60px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-family: 'DM Mono', monospace; font-size: 12px; text-align: center; color: var(--ink); outline: none; }
+    /* STORE MATERIALS */
+    .store-mat-section { padding: 0 20px 16px; }
+    .store-mat-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border2); }
+    .store-mat-row:last-child { border-bottom: none; }
+    .store-mat-name { flex: 1; font-size: 13px; color: var(--ink); }
+    .store-mat-qty { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+    .store-mat-toggle { width: 20px; height: 20px; border: 1.5px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all .15s; flex-shrink: 0; }
+    .store-mat-toggle.on { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .store-mat-qty-input { width: 50px; background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 4px 6px; font-family: 'DM Mono', monospace; font-size: 12px; text-align: center; color: var(--ink); outline: none; }
+    /* REPORT MODAL */
+    .report-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .report-stat { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+    .report-stat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .report-stat-val { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .mat-received-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border2); font-size: 13px; }
+    .mat-received-row:last-child { border-bottom: none; }
+    .mat-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mat-status-dot.ok { background: var(--green); }
+    .mat-status-dot.nok { background: var(--red); }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .photo-thumb { border-radius: 8px; overflow: hidden; aspect-ratio: 1; cursor: pointer; }
+    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .2s; }
+    .photo-thumb img:hover { opacity: .85; }
+        .print-header{display:none;padding:0 0 24px;border-bottom:2px solid var(--accent);margin-bottom:24px;}
     .print-logo{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--accent);margin-bottom:4px;}
     .print-title{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:var(--ink);}
     .print-meta{font-size:12px;color:var(--muted);margin-top:4px;}
@@ -347,6 +383,13 @@
             <div class="panel-header"><div class="panel-title">Store activity</div></div>
             <div id="detail-stores"><div class="panel-empty">No activity yet.</div></div>
           </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Project materials</div>
+              <span class="panel-link" onclick="openAddMaterialModal()">+ Add material</span>
+            </div>
+            <div id="project-materials-list"><div class="panel-empty">No materials defined. Add materials to the project to assign them to stores.</div></div>
+          </div>
         </div>
         <div>
           <div class="panel">
@@ -395,8 +438,8 @@
     </div>
     <label class="form-label">Alert email</label>
     <input class="form-input" type="email" id="camp-email" value="hello@moveops.services">
-    <label class="form-label">Installation steps (one per line)</label>
-    <textarea class="form-input" rows="4" placeholder="Before photo&#10;Materials confirmed&#10;Display installed&#10;Final photo" id="camp-steps" style="resize:vertical"></textarea>
+    <label class="form-label">Project materials (one per line, format: Name · quantity)</label>
+    <textarea class="form-input" rows="4" placeholder="Lateral panels · 2&#10;Central display · 1&#10;Vinyl stickers · 10&#10;Floor stand · 1" id="camp-materials" style="resize:vertical"></textarea>
     <div class="modal-actions">
       <button class="btn-sm ghost" onclick="closeModal()">Cancel</button>
       <button class="btn-sm primary" id="modal-btn" onclick="createCampaign()">Create campaign →</button>
@@ -422,7 +465,7 @@
 
 <!-- STORE MODAL -->
 <div class="modal-overlay" id="store-modal" onclick="if(event.target===this)closeStoreModal()">
-  <div class="modal" style="max-width:480px">
+  <div class="modal" style="max-width:520px">
     <button class="modal-close-x" onclick="closeStoreModal()">×</button>
     <div class="modal-title">Add store</div>
     <div class="modal-sub">This store will get its own installation link.</div>
@@ -434,9 +477,32 @@
       <div><label class="form-label">Contact name</label><input class="form-input" id="store-contact-name" placeholder="Ana López"></div>
       <div><label class="form-label">Contact phone</label><input class="form-input" id="store-contact-phone" placeholder="+34 600 000 000"></div>
     </div>
+    <label class="form-label">Materials to send <span style="color:var(--muted);font-weight:400">(select from project materials)</span></label>
+    <div id="store-materials-selector" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:4px 0;">
+      <div style="padding:12px;color:var(--muted);font-size:13px">No project materials defined yet.</div>
+    </div>
     <div class="modal-actions">
       <button class="btn-sm ghost" onclick="closeStoreModal()">Cancel</button>
       <button class="btn-sm primary" id="store-modal-btn" onclick="createStore()">Add store →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MATERIAL MODAL -->
+<div class="modal-overlay" id="material-modal" onclick="if(event.target===this)closeMaterialModal()">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close-x" onclick="closeMaterialModal()">×</button>
+    <div class="modal-title">Add material</div>
+    <div class="modal-sub">Add a material to this project's catalogue.</div>
+    <label class="form-label">Material name *</label>
+    <input class="form-input" id="mat-name-input" placeholder="e.g. Lateral panels">
+    <div class="form-row">
+      <div><label class="form-label">Unit</label><input class="form-input" id="mat-unit-input" placeholder="units" value="units"></div>
+      <div><label class="form-label">Description</label><input class="form-input" id="mat-desc-input" placeholder="Optional"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm ghost" onclick="closeMaterialModal()">Cancel</button>
+      <button class="btn-sm primary" id="mat-modal-btn" onclick="saveMaterial()">Add material →</button>
     </div>
   </div>
 </div>
@@ -464,7 +530,7 @@ const H = {
 };
 const HP = { ...H, 'Prefer': 'return=representation' }; // use for POST/PATCH
 
-let projects = [], alerts = [], stores = [], currentId = null;
+let projects = [], alerts = [], stores = [], reports = [], projectMaterials = {}, currentId = null;
 
 async function get(path) {
   const r = await fetch(`${SB}/rest/v1/${path}`, { headers: H });
@@ -516,10 +582,11 @@ async function loadAll(){
     } catch(e){}
   }
   try {
-    [projects, alerts, stores] = await Promise.all([
+    [projects, alerts, stores, reports] = await Promise.all([
       get('projects?type=eq.store&order=created_at.desc'),
       get('alerts?order=created_at.desc'),
-      get('stores?order=created_at.asc')
+      get('stores?order=created_at.asc'),
+      get('installation_reports?order=created_at.desc')
     ]);
     renderAll();
   } catch(e) {
@@ -616,13 +683,14 @@ function openDetail(id){
   document.getElementById('print-meta').textContent = `Execution report · Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;
 
   const pa = alertsFor(id);
-  const open = pa.filter(a=>a.status!=='resolved').length;
-  const completions = pa.filter(a=>a.message&&a.message.toLowerCase().includes('complete')).length;
-  const stores = [...new Set(pa.map(a=>a.installer_name).filter(Boolean))].length;
+  const open = pa.filter(a=>a.status!=='resolved'&&a.type!=='completion').length;
+  const projReports = reports.filter(r=>r.project_id===id);
+  const completions = projReports.filter(r=>r.status==='complete').length;
+  const totalStores = storesForProject(id).length;
 
   document.getElementById('detail-stats').innerHTML = `
     <div class="stat-card accent-card"><div class="stat-label">Status</div><div class="stat-val" style="font-size:20px">${p.active?'● Live':'Done'}</div></div>
-    <div class="stat-card"><div class="stat-label">Stores active</div><div class="stat-val">${stores}</div><div class="stat-sub">reported in</div></div>
+    <div class="stat-card"><div class="stat-label">Stores</div><div class="stat-val">${totalStores}</div><div class="stat-sub">${completions} completed</div></div>
     <div class="stat-card"><div class="stat-label">Open alerts</div><div class="stat-val" style="color:${open>0?'var(--red)':'var(--green)'}">${open}</div></div>
     <div class="stat-card"><div class="stat-label">Completions</div><div class="stat-val">${completions}</div></div>
   `;
@@ -644,6 +712,7 @@ function openDetail(id){
   renderDetailStoresList(id);
   renderDetailStores(id);
   renderDetailAlerts(id);
+  loadProjectMaterials(id);
 }
 
 async function toggleCampaignActive(){
@@ -665,36 +734,33 @@ async function toggleCampaignActive(){
 
 function renderDetailStores(id){
   const el = document.getElementById('detail-stores');
-  const pa = alertsFor(id);
-  if(!pa.length){
+  const ss = storesForProject(id);
+  if(!ss.length){
     el.innerHTML = '<div class="panel-empty">No activity yet. Share the store link to start.</div>';
     return;
   }
-  // Group by store
-  const byStore = {};
-  pa.forEach(a => {
-    const k = a.sent_by || a.installer_name || 'Unknown';
-    if(!byStore[k]) byStore[k]=[];
-    byStore[k].push(a);
-  });
-  const rows = Object.entries(byStore).map(([store,evts]) => {
-    const last = evts[evts.length-1];
-    const hasOpen = evts.some(e=>!e.resolved && e.message && !e.message.toLowerCase().includes('complete'));
-    const done = evts.some(e=>e.message&&e.message.toLowerCase().includes('complete'));
-    let pill=done?'complete':hasOpen?'alert':'inprogress';
-    let label=done?'✓ Complete':hasOpen?'⚠ Alert':'In progress';
-    const gps = last.gps_lat
-      ? `<a href="https://maps.google.com/?q=${last.gps_lat},${last.gps_lng}" target="_blank" style="font-size:10px;color:var(--accent2)">📍 map</a>`
-      : '';
-    return `<div class="store-row">
-      <div><div class="store-row-name">${esc(store)}</div><div class="store-row-city">${gps}</div></div>
-      <div class="mono">${evts.length} events</div>
+  const rows = ss.map(s => {
+    const rep = reports.find(r => r.store_id === s.id);
+    let pill='pending', label='Pending', dateStr='—', gps='';
+    if (rep) {
+      if (rep.status === 'complete') { pill='complete'; label='✓ Complete'; }
+      else if (rep.status === 'in_progress') { pill='inprogress'; label='In progress'; }
+      dateStr = fmtTime(rep.completed_at || rep.started_at);
+      if (rep.gps_lat) gps = `<a href="https://maps.google.com/?q=${rep.gps_lat},${rep.gps_lng}" target="_blank" style="font-size:10px;color:var(--accent2)">📍 map</a>`;
+    }
+    // also check alerts for this store for any open issues
+    const storeAlerts = alerts.filter(a => a.store_id === s.id || a.sent_by === s.name);
+    const hasAlert = storeAlerts.some(a => a.status !== 'resolved' && a.type !== 'completion');
+    if (hasAlert && pill !== 'complete') { pill='alert'; label='⚠ Alert'; }
+    return `<div class="store-row" style="cursor:pointer" onclick="openStoreReport('${s.id}')">
+      <div><div class="store-row-name">${esc(s.name)}</div><div class="store-row-city">${gps}</div></div>
+      <div class="mono">${rep ? (rep.status==='complete'?'Done':'Active') : '—'}</div>
       <span class="status-pill ${pill}">${label}</span>
-      <div class="mono">${fmtTime(last.created_at)}</div>
+      <div class="mono">${dateStr}</div>
     </div>`;
   }).join('');
   el.innerHTML = `
-    <div class="table-head"><span>Store</span><span>Activity</span><span>Status</span><span>Last update</span></div>
+    <div class="table-head"><span>Store</span><span>Report</span><span>Status</span><span>Last update</span></div>
     ${rows}`;
 }
 
@@ -781,32 +847,7 @@ function openModal(){ document.getElementById('modal').classList.add('open'); se
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeStoreModal(); closeStoreActivity(); } });
 
-async function createCampaign(){
-  const name = document.getElementById('camp-name').value.trim();
-  const brand = document.getElementById('camp-brand').value.trim();
-  const location = document.getElementById('camp-location').value.trim() || 'Spain';
-  const email = document.getElementById('camp-email').value.trim() || 'hello@moveops.services';
-  if(!name){ document.getElementById('camp-name').focus(); return; }
-  const btn = document.getElementById('modal-btn');
-  btn.textContent = 'Creating...'; btn.disabled = true;
-  try {
-    // get current user id
-    let uid = (JSON.parse(sessionStorage.getItem('sb_user')||'{}')).id;
-    if (!uid) {
-      try { const ru = await fetch(`${SB}/auth/v1/user`,{headers:H}); const uu=await ru.json(); uid=uu.id; sessionStorage.setItem('sb_user',JSON.stringify({id:uu.id,email:uu.email})); } catch(e){}
-    }
-    const data = await post('projects', { type:'store', client:name||brand||'Campaign', location, pm_email:email, active:true, user_id:uid });
-    const p = data[0];
-    projects.unshift(p);
-    closeModal();
-    renderAll();
-    // Copy link and open detail
-    try { await navigator.clipboard.writeText(storeLink(p.id)); } catch(e){}
-    toast('✓ Campaign created — store link copied!');
-    setTimeout(() => openDetail(p.id), 300);
-  } catch(e){ toast('⚠ Error: '+e.message); }
-  btn.textContent = 'Create campaign →'; btn.disabled = false;
-}
+// createCampaign defined below with materials support
 
 // ── STORE LINK ────────────────────────────────────────
 async function copyStoreLink(){
@@ -857,8 +898,10 @@ function signOut() {
   window.location.href = 'login.html';
 }
 
-// ── STORE ACTIVITY MODAL ─────────────────────────────
-function openStoreActivity(storeId) {
+// ── STORE REPORT MODAL ───────────────────────────────
+async function openStoreActivity(storeId) { openStoreReport(storeId); }
+
+async function openStoreReport(storeId) {
   const store = stores.find(s => s.id === storeId);
   if (!store) return;
 
@@ -869,66 +912,97 @@ function openStoreActivity(storeId) {
   ].filter(Boolean);
   document.getElementById('sam-meta').innerHTML = metaParts.map(p => `<span>${esc(p)}</span>`).join('');
 
-  // Filter alerts for this store (by installer_name matching store name OR store_id)
-  const storeName = store.name;
-  const storeAlerts = alerts.filter(a =>
-    a.store_id === storeId ||
-    (a.sent_by && a.sent_by === storeName) ||
-    (a.installer_name && a.installer_name === storeName)
-  );
-
-  const body = document.getElementById('sam-body');
-
-  if (!storeAlerts.length) {
-    body.innerHTML = '<div class="store-modal-empty">No activity yet for this store.<br><span style="font-size:12px;margin-top:8px;display:block">Share the store link with the installation team to get started.</span></div>';
-  } else {
-    // Separate photo events from regular events
-    const photoAlerts = storeAlerts.filter(a => a.photo_url);
-    const eventAlerts = storeAlerts.filter(a => !a.photo_url);
-
-    let bodyHTML = '';
-
-    // Events section
-    if (eventAlerts.length) {
-      bodyHTML += '<div class="store-modal-section">Activity log</div>';
-      bodyHTML += eventAlerts.map(a => {
-        const done = a.message && a.message.toLowerCase().includes('complete');
-        const err  = a.message && (a.message.toLowerCase().includes('block') || a.message.toLowerCase().includes('missing') || a.message.toLowerCase().includes('denied'));
-        const icon = done ? '✅' : err ? '🚨' : '⚠️';
-        const cls  = done ? 'success' : err ? 'error' : 'warning';
-        const gps  = a.gps_lat ? `<div class="store-event-gps"><a href="https://maps.google.com/?q=${a.gps_lat},${a.gps_lng}" target="_blank">📍 View on map</a></div>` : '';
-        return `<div class="store-event">
-          <div class="store-event-icon ${cls}">${icon}</div>
-          <div class="store-event-body">
-            <div class="store-event-msg">${esc(a.message || '')}</div>
-            <div class="store-event-time">${fmtTime(a.created_at)}</div>
-            ${gps}
-          </div>
-        </div>`;
-      }).join('');
-    }
-
-    // Photos section
-    if (photoAlerts.length) {
-      bodyHTML += '<div class="store-modal-section">Photos</div>';
-      bodyHTML += '<div class="photo-grid">' + photoAlerts.map(a =>
-        `<div class="photo-thumb"><img src="${esc(a.photo_url)}" alt="Installation photo" onclick="window.open('${esc(a.photo_url)}','_blank')"></div>`
-      ).join('') + '</div>';
-    }
-
-    body.innerHTML = bodyHTML;
-  }
-
-  // Add copy link button in header meta
+  // Add copy link
   const copyBtn = document.createElement('button');
-  copyBtn.className = 'store-link-copy';
-  copyBtn.style.marginLeft = 'auto';
+  copyBtn.className = 'store-link-copy'; copyBtn.style.marginLeft = 'auto';
   copyBtn.innerHTML = '🔗 Copy link';
   copyBtn.onclick = () => copyStoreSpecificLink(currentId, storeId);
-  const meta = document.getElementById('sam-meta');
-  meta.appendChild(copyBtn);
+  document.getElementById('sam-meta').appendChild(copyBtn);
 
   document.getElementById('store-activity-modal').classList.add('open');
+  const body = document.getElementById('sam-body');
+  body.innerHTML = '<div class="loading"><div class="spinner"></div> Loading report…</div>';
+
+  // Find installation report for this store
+  const rep = reports.find(r => r.store_id === storeId);
+
+  if (!rep) {
+    // No report yet — check for alerts
+    const storeAlerts = alerts.filter(a => a.store_id === storeId || a.sent_by === store.name);
+    if (!storeAlerts.length) {
+      body.innerHTML = '<div class="store-modal-empty">No activity yet for this store.<br><span style="font-size:12px;margin-top:8px;display:block">Share the store link with the installation team to get started.</span></div>';
+    } else {
+      body.innerHTML = renderAlertsOnly(storeAlerts);
+    }
+    return;
+  }
+
+  // Load report details: photos + materials
+  let photos = [], materials = [];
+  try {
+    [photos, materials] = await Promise.all([
+      get(`report_photos?report_id=eq.${rep.id}&order=step_index.asc`),
+      get(`report_materials?report_id=eq.${rep.id}&order=created_at.asc`)
+    ]);
+  } catch(e) { console.warn('Report detail load:', e); }
+
+  const storeAlerts = alerts.filter(a =>
+    (a.store_id === storeId || a.sent_by === store.name) && a.type !== 'completion'
+  );
+  const durMin = rep.started_at && rep.completed_at
+    ? Math.round((new Date(rep.completed_at) - new Date(rep.started_at)) / 60000) : null;
+
+  let html = '';
+
+  // Stats row
+  html += `<div class="report-detail-grid">
+    <div class="report-stat"><div class="report-stat-label">Status</div><div class="report-stat-val">${rep.status === 'complete' ? '✓ Complete' : rep.status === 'in_progress' ? '⏳ In progress' : rep.status}</div></div>
+    <div class="report-stat"><div class="report-stat-label">Duration</div><div class="report-stat-val">${durMin !== null ? durMin + ' min' : '—'}</div></div>
+    <div class="report-stat"><div class="report-stat-label">GPS</div><div class="report-stat-val" style="font-size:13px">${rep.gps_lat ? `<a href="https://maps.google.com/?q=${rep.gps_lat},${rep.gps_lng}" target="_blank" style="color:var(--accent2)">📍 View map</a>` : '—'}</div></div>
+    <div class="report-stat"><div class="report-stat-label">Signed by</div><div class="report-stat-val" style="font-size:13px">${esc(rep.contact_name || '—')}</div></div>
+  </div>`;
+
+  // Materials
+  if (materials.length) {
+    html += '<div class="store-modal-section">Materials received</div>';
+    html += materials.map(m => {
+      const ok = m.ok;
+      return `<div class="mat-received-row">
+        <div class="mat-status-dot ${ok ? 'ok' : 'nok'}"></div>
+        <div style="flex:1">${esc(m.material_name)}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${m.quantity_received}/${m.quantity_planned} ${ok ? '' : '⚠'}</div>
+        ${m.notes ? `<div style="font-size:11px;color:var(--red);margin-left:8px">${esc(m.notes)}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // Photos
+  if (photos.length) {
+    html += '<div class="store-modal-section">Photos</div>';
+    html += '<div class="photo-grid">' + photos.map(ph =>
+      `<div class="photo-thumb">
+        <img src="${esc(ph.photo_url)}" alt="${esc(ph.step_title||'')}" onclick="window.open('${esc(ph.photo_url)}','_blank')" title="${esc(ph.step_title||'')}">
+      </div>`
+    ).join('') + '</div>';
+    // GPS for first photo
+    const withGps = photos.filter(p => p.gps_lat);
+    if (withGps.length) {
+      html += `<div style="margin-top:8px;font-size:12px;color:var(--muted)">📍 Photos include GPS coordinates</div>`;
+    }
+  }
+
+  // Alerts for this store
+  if (storeAlerts.length) {
+    html += '<div class="store-modal-section">Alerts</div>';
+    html += storeAlerts.map(a => alertHTML(a)).join('');
+  }
+
+  body.innerHTML = html || '<div class="store-modal-empty">No installation data yet.</div>';
+}
+
+function renderAlertsOnly(storeAlerts) {
+  return '<div class="store-modal-section">Activity log</div>' +
+    storeAlerts.map(a => alertHTML(a)).join('');
 }
 
 function closeStoreActivity() {
@@ -972,39 +1046,9 @@ async function copyStoreSpecificLink(projectId, storeId){
   catch(e){ prompt('Copy this link:', link); }
 }
 
-function openStoreModal(){
-  if(!currentId){ toast('⚠ Open a campaign first'); return; }
-  ['store-name','store-address','store-contact-name','store-contact-phone'].forEach(id=>{
-    document.getElementById(id).value='';
-  });
-  document.getElementById('store-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('store-name').focus(), 200);
-}
 function closeStoreModal(){ document.getElementById('store-modal').classList.remove('open'); }
 
-async function createStore(){
-  const name = document.getElementById('store-name').value.trim();
-  if(!name){ document.getElementById('store-name').focus(); return; }
-  const btn = document.getElementById('store-modal-btn');
-  btn.textContent = 'Adding...'; btn.disabled = true;
-
-  const body = {
-    project_id:    currentId,
-    name,
-    address:       document.getElementById('store-address').value.trim() || null,
-    contact_name:  document.getElementById('store-contact-name').value.trim() || null,
-    contact_phone: document.getElementById('store-contact-phone').value.trim() || null
-  };
-
-  try {
-    const data = await post('stores', body);
-    stores.push(data[0]);
-    closeStoreModal();
-    renderDetailStoresList(currentId);
-    toast('✓ Store added — link ready to copy!');
-  } catch(e){ toast('⚠ Error: '+e.message); }
-  btn.textContent = 'Add store →'; btn.disabled = false;
-}
+// createStore defined below with materials support
 
 async function deleteStore(storeId){
   if(!confirm('Remove this store?')) return;
@@ -1017,6 +1061,198 @@ async function deleteStore(storeId){
     renderDetailStoresList(currentId);
     toast('Store removed');
   } catch(e){ toast('⚠ Could not remove store'); }
+}
+
+// ── MATERIALS ─────────────────────────────────────────
+async function loadProjectMaterials(projectId) {
+  if (!projectId) return;
+  try {
+    const mats = await get(`project_materials?project_id=eq.${projectId}&order=sort_order.asc,created_at.asc`);
+    projectMaterials[projectId] = mats;
+    renderProjectMaterials(projectId);
+  } catch(e) { console.warn('Materials load:', e); }
+}
+
+function renderProjectMaterials(projectId) {
+  const el = document.getElementById('project-materials-list');
+  if (!el) return;
+  const mats = projectMaterials[projectId] || [];
+  if (!mats.length) {
+    el.innerHTML = '<div class="panel-empty">No materials defined. Click "+ Add material" to start.</div>';
+    return;
+  }
+  el.innerHTML = mats.map(m => `
+    <div class="mat-row">
+      <div class="mat-row-name">${esc(m.name)}</div>
+      <div class="mat-row-unit">${esc(m.unit||'units')}</div>
+      ${m.description ? `<div style="font-size:11px;color:var(--muted);flex:1">${esc(m.description)}</div>` : '<div style="flex:1"></div>'}
+      <button class="mat-del" onclick="deleteMaterial('${m.id}','${projectId}')" title="Remove">×</button>
+    </div>`).join('');
+}
+
+function openAddMaterialModal() {
+  if (!currentId) { toast('⚠ Open a campaign first'); return; }
+  ['mat-name-input','mat-unit-input','mat-desc-input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'mat-unit-input' ? 'units' : '';
+  });
+  document.getElementById('material-modal').classList.add('open');
+  setTimeout(() => document.getElementById('mat-name-input').focus(), 200);
+}
+function closeMaterialModal() { document.getElementById('material-modal').classList.remove('open'); }
+
+async function saveMaterial() {
+  const name = document.getElementById('mat-name-input').value.trim();
+  if (!name) { document.getElementById('mat-name-input').focus(); return; }
+  const btn = document.getElementById('mat-modal-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  try {
+    const data = await post('project_materials', {
+      project_id:  currentId,
+      name,
+      unit:        document.getElementById('mat-unit-input').value.trim() || 'units',
+      description: document.getElementById('mat-desc-input').value.trim() || null
+    });
+    if (!projectMaterials[currentId]) projectMaterials[currentId] = [];
+    projectMaterials[currentId].push(Array.isArray(data) ? data[0] : data);
+    closeMaterialModal();
+    renderProjectMaterials(currentId);
+    toast('✓ Material added');
+  } catch(e) { toast('⚠ Error: ' + e.message); }
+  btn.textContent = 'Add material →'; btn.disabled = false;
+}
+
+async function deleteMaterial(matId, projectId) {
+  if (!confirm('Remove this material?')) return;
+  try {
+    await fetch(`${SB}/rest/v1/project_materials?id=eq.${matId}`, { method:'DELETE', headers:H });
+    projectMaterials[projectId] = (projectMaterials[projectId]||[]).filter(m => m.id !== matId);
+    renderProjectMaterials(projectId);
+    toast('Material removed');
+  } catch(e) { toast('⚠ Could not remove'); }
+}
+
+// ── STORE MATERIALS (selector in add store modal) ─────────────────────────
+function renderStoreMaterialsSelector(projectId) {
+  const el = document.getElementById('store-materials-selector');
+  if (!el) return;
+  const mats = projectMaterials[projectId] || [];
+  if (!mats.length) {
+    el.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px">No project materials defined yet. Add them in "Project materials".</div>';
+    return;
+  }
+  el.innerHTML = mats.map(m => `
+    <div class="store-mat-row" style="padding:8px 14px">
+      <div class="store-mat-toggle on" id="smt-${m.id}" onclick="toggleStoreMat('${m.id}')">✓</div>
+      <div class="store-mat-name">${esc(m.name)}</div>
+      <input class="store-mat-qty-input" type="number" id="smq-${m.id}" value="1" min="0" placeholder="Qty">
+      <div class="store-mat-qty">${esc(m.unit||'units')}</div>
+    </div>`).join('');
+}
+
+function toggleStoreMat(matId) {
+  const el = document.getElementById('smt-' + matId);
+  const isOn = el.classList.contains('on');
+  el.classList.toggle('on', !isOn);
+  el.textContent = isOn ? '' : '✓';
+}
+
+// ── UPDATE openStoreModal to populate selector ────────────────────────────
+const _origOpenStoreModal = openStoreModal;
+function openStoreModal() {
+  if (!currentId) { toast('⚠ Open a campaign first'); return; }
+  ['store-name','store-address','store-contact-name','store-contact-phone'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  renderStoreMaterialsSelector(currentId);
+  document.getElementById('store-modal').classList.add('open');
+  setTimeout(() => document.getElementById('store-name').focus(), 200);
+}
+
+// ── UPDATE createStore to save store_materials ────────────────────────────
+const _origCreateStore = createStore;
+async function createStore() {
+  const name = document.getElementById('store-name').value.trim();
+  if (!name) { document.getElementById('store-name').focus(); return; }
+  const btn = document.getElementById('store-modal-btn');
+  btn.textContent = 'Adding...'; btn.disabled = true;
+
+  try {
+    const storeData = await post('stores', {
+      project_id:    currentId,
+      name,
+      address:       document.getElementById('store-address').value.trim() || null,
+      contact_name:  document.getElementById('store-contact-name').value.trim() || null,
+      contact_phone: document.getElementById('store-contact-phone').value.trim() || null
+    });
+    const newStore = Array.isArray(storeData) ? storeData[0] : storeData;
+    stores.push(newStore);
+
+    // Save selected materials
+    const mats = projectMaterials[currentId] || [];
+    for (const m of mats) {
+      const toggle = document.getElementById('smt-' + m.id);
+      if (toggle && toggle.classList.contains('on')) {
+        const qty = parseInt(document.getElementById('smq-' + m.id)?.value) || 1;
+        try {
+          await post('store_materials', {
+            store_id: newStore.id, project_material_id: m.id, quantity_planned: qty
+          });
+        } catch(e) { console.warn('store_material save:', e); }
+      }
+    }
+
+    closeStoreModal();
+    renderDetailStoresList(currentId);
+    toast('✓ Store added — link ready to copy!');
+  } catch(e) { toast('⚠ Error: ' + e.message); }
+  btn.textContent = 'Add store →'; btn.disabled = false;
+}
+
+// Close material modal on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeMaterialModal(); }
+});
+
+// ── UPDATE createCampaign to also save materials ──────────────────────────
+// (materials from the textarea are saved after campaign creation)
+const _origCreateCampaign = createCampaign;
+async function createCampaign() {
+  const name = document.getElementById('camp-name').value.trim();
+  const brand = document.getElementById('camp-brand').value.trim();
+  const location = document.getElementById('camp-location').value.trim() || 'Spain';
+  const email = document.getElementById('camp-email').value.trim() || 'hello@moveops.services';
+  const materialsText = document.getElementById('camp-materials')?.value?.trim() || '';
+  if (!name) { document.getElementById('camp-name').focus(); return; }
+  const btn = document.getElementById('modal-btn');
+  btn.textContent = 'Creating...'; btn.disabled = true;
+  try {
+    let uid = (JSON.parse(sessionStorage.getItem('sb_user') || '{}')).id;
+    if (!uid) {
+      try { const ru = await fetch(`${SB}/auth/v1/user`,{headers:H}); const uu=await ru.json(); uid=uu.id; sessionStorage.setItem('sb_user',JSON.stringify({id:uu.id,email:uu.email})); } catch(e){}
+    }
+    const data = await post('projects', { type:'store', client:name||brand||'Campaign', location, pm_email:email, active:true, user_id:uid });
+    const p = Array.isArray(data) ? data[0] : data;
+    projects.unshift(p);
+
+    // Save materials from textarea
+    if (materialsText && p.id) {
+      const lines = materialsText.split('\n').map(l=>l.trim()).filter(Boolean);
+      for (const line of lines) {
+        const parts = line.split(/·|-/).map(s=>s.trim());
+        const matName = parts[0] || line;
+        const qty = parseInt(parts[1]) || 1;
+        try { await post('project_materials', { project_id: p.id, name: matName, unit: 'units' }); } catch(e){}
+      }
+    }
+
+    closeModal();
+    renderAll();
+    try { await navigator.clipboard.writeText(storeLink(p.id)); } catch(e){}
+    toast('✓ Campaign created — store link copied!');
+    setTimeout(() => openDetail(p.id), 300);
+  } catch(e) { toast('⚠ Error: '+e.message); }
+  btn.textContent = 'Create campaign →'; btn.disabled = false;
 }
 
 loadAll();

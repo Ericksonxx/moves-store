@@ -11,50 +11,38 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --accent:   #1A3A2A;
-      --accent2:  #2D6048;
-      --green:    #4CAF82;
-      --gold:     #C9A84C;
-      --red:      #C0392B;
-      --ink:      #0D0D0D;
-      --bg:       #F5F2ED;
-      --white:    #FAFAF8;
-      --border:   #E2DED7;
-      --muted:    #888880;
+      --accent:  #1A3A2A; --accent2: #2D6048; --green: #4CAF82;
+      --red: #C0392B; --ink: #0D0D0D; --bg: #F5F2ED;
+      --white: #FAFAF8; --border: #E2DED7; --muted: #888880;
     }
     html, body { height: 100%; background: var(--bg); overflow: hidden; }
     body { font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; }
-
-    /* ── SCREENS ── */
     .screen { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
     .screen.active { display: flex; }
 
-    /* ── IDENTIFY SCREEN ── */
-    .id-screen { background: var(--accent); }
+    /* ── IDENTIFY ── */
+    .id-screen { background: var(--accent); display:flex; flex-direction:column; flex:1; }
     .id-top { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 32px 32px; text-align: center; }
     .id-logo { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 4px; color: rgba(255,255,255,0.4); margin-bottom: 48px; text-transform: uppercase; }
     .id-icon { width: 72px; height: 72px; border-radius: 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px; }
-    .id-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
     .id-brand { font-family: 'DM Mono', monospace; font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 8px; }
-    .id-store { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.75); }
-    .id-bottom { background: var(--white); border-radius: 24px 24px 0 0; padding: 28px 24px 40px; }
+    .id-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+    .id-store { font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.85); margin-top: 4px; }
+    .id-bottom { background: var(--white); border-radius: 24px 24px 0 0; padding: 28px 24px calc(40px + env(safe-area-inset-bottom)); }
     .id-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
     .id-steps-preview { display: flex; gap: 8px; margin-bottom: 24px; }
     .id-step-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
-    .id-step-dot:first-child { background: var(--accent2); }
     .id-gps { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 24px; background: rgba(26,58,42,0.05); padding: 10px 14px; border-radius: 8px; }
     .id-gps-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: blink 2s ease infinite; flex-shrink: 0; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .btn-start { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
-    .btn-start:hover { background: var(--accent2); }
+    .btn-start { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .btn-start:disabled { background: var(--muted); cursor: not-allowed; }
 
-    /* ── MAIN SCREEN ── */
+    /* ── MAIN ── */
     .main-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 20px; flex-shrink: 0; }
     .main-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .header-logo { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
-    .header-alert-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-    .header-alert-btn:hover { border-color: var(--red); color: var(--red); }
-    .progress-section {}
+    .header-alert-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; }
     .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .progress-label span { font-size: 12px; color: var(--muted); }
     .progress-label strong { font-size: 12px; color: var(--accent2); font-weight: 700; }
@@ -64,41 +52,93 @@
     .progress-step-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
     .progress-step-dot.done { background: var(--green); }
     .progress-step-dot.current { background: var(--accent2); }
-
     .main-content { flex: 1; padding: 20px 20px 100px; overflow-y: auto; }
-    .main-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); padding: 14px 20px; safe-area-inset-bottom: env(safe-area-inset-bottom); }
+    .main-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); }
 
-    /* ── STEP CARD ── */
-    .step-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; transition: opacity 0.3s, transform 0.3s; }
+    /* ── STEP CARDS ── */
+    .step-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; transition: opacity 0.3s; }
     .step-card.locked { opacity: 0.45; pointer-events: none; }
-    .step-card.done-card { opacity: 0.6; }
+    .step-card.done-card { opacity: 0.65; }
     .step-card.active-card { border-color: var(--accent2); box-shadow: 0 2px 16px rgba(26,58,42,0.1); }
-
-    .step-header { padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+    .step-header { padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px; }
     .step-num-badge { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; flex-shrink: 0; }
-    .step-num-badge.pending { background: var(--bg); color: var(--muted); }
-    .step-num-badge.active { background: var(--accent); color: #fff; }
+    .step-num-badge.pending  { background: var(--bg); color: var(--muted); }
+    .step-num-badge.active   { background: var(--accent); color: #fff; }
     .step-num-badge.complete { background: var(--green); color: #fff; font-size: 14px; }
     .step-info { flex: 1; }
     .step-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
-    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .step-desc  { font-size: 13px; color: var(--muted); line-height: 1.4; }
     .step-type-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); margin-top: 4px; }
-
     .step-body { padding: 0 18px 18px; border-top: 1px solid var(--border); }
 
-    /* photo capture */
-    .photo-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
-    .photo-zone:hover { border-color: var(--accent2); background: rgba(26,58,42,0.02); }
+    /* photo */
+    .photo-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-top: 14px; }
     .photo-zone.has-photo { border-style: solid; border-color: var(--green); background: rgba(76,175,130,0.04); }
-    .photo-zone-icon { font-size: 28px; margin-bottom: 8px; }
+    .photo-zone-icon  { font-size: 28px; margin-bottom: 8px; }
     .photo-zone-label { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
-    .photo-zone-sub { font-size: 12px; color: var(--muted); }
-    .photo-preview { width: 100%; border-radius: 8px; margin-top: 10px; display: none; }
+    .photo-zone-sub   { font-size: 12px; color: var(--muted); }
+    .photo-preview { width: 100%; border-radius: 8px; margin-top: 10px; display: none; max-height: 200px; object-fit: cover; }
     .photo-preview.show { display: block; }
     .photo-gps-tag { display: inline-flex; align-items: center; gap: 5px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent2); background: var(--bg); padding: 4px 8px; border-radius: 5px; margin-top: 6px; }
     .photo-gps-tag.hidden { display: none; }
 
-    /* ── CAMERA OVERLAY ── */
+    /* materials */
+    .materials-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .mat-item { background: var(--bg); border-radius: 10px; padding: 12px 14px; }
+    .mat-item-row { display: flex; align-items: center; gap: 10px; }
+    .mat-status { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 16px; border: 2px solid var(--border); background: var(--white); transition: all 0.15s; }
+    .mat-status.ok  { background: var(--green); border-color: var(--green); color: #fff; }
+    .mat-status.nok { background: var(--red);   border-color: var(--red);   color: #fff; }
+    .mat-info { flex: 1; min-width: 0; }
+    .mat-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+    .mat-planned { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .mat-qty-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .mat-qty-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); line-height: 1; }
+    .mat-qty-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 600; min-width: 24px; text-align: center; }
+    .mat-notes-input { display: none; width: 100%; margin-top: 8px; background: var(--white); border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; }
+    .mat-item.has-issue .mat-notes-input { display: block; }
+    .mat-no-items { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 0; }
+
+    /* contact */
+    .contact-section { margin-top: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .contact-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+    .contact-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; transition: border-color 0.2s; }
+    .contact-input:focus { border-color: var(--accent2); }
+    .sig-wrap { }
+    .sig-pad-outer { border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--white); position: relative; }
+    .sig-hint-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 13px; color: #ccc; pointer-events: none; text-align: center; }
+    #sig-canvas { display: block; width: 100%; touch-action: none; cursor: crosshair; }
+    .sig-clear { font-size: 11px; color: var(--muted); text-decoration: underline; cursor: pointer; margin-top: 6px; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; }
+
+    /* buttons */
+    .btn-confirm { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 14px; }
+    .btn-confirm:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .btn-main { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .btn-main:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+    /* ── ALERT ── */
+    .alert-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); background: var(--white); flex-shrink: 0; }
+    .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); }
+    .alert-header-title { font-size: 16px; font-weight: 700; }
+    .alert-body { padding: 24px 20px; flex: 1; background: var(--white); }
+    .alert-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .alert-option { padding: 14px 16px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+    .alert-option.selected { border-color: var(--red); background: rgba(192,57,43,0.05); color: var(--red); }
+    .alert-textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; resize: none; margin-bottom: 16px; }
+    .btn-alert-send { width: 100%; padding: 15px; background: var(--red); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+    /* ── DONE ── */
+    .done-screen { background: var(--accent); align-items: center; justify-content: center; text-align: center; padding: 48px 32px; }
+    .done-icon  { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 28px; }
+    .done-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .done-sub   { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 40px; line-height: 1.6; max-width: 300px; margin-left: auto; margin-right: auto; }
+    .done-summary { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; width: 100%; max-width: 320px; margin: 0 auto 32px; text-align: left; }
+    .done-summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 13px; }
+    .done-summary-row:last-child { border-bottom: none; }
+    .done-summary-row span   { color: rgba(255,255,255,0.45); }
+    .done-summary-row strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+    /* ── CAMERA ── */
     .camera-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: #000; }
     .camera-overlay.open { display: block; }
     #camera-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -107,7 +147,7 @@
     .camera-shutter { width: 80px; height: 80px; border-radius: 50%; background: #fff; border: 5px solid rgba(255,255,255,0.5); cursor: pointer; transition: transform 0.1s; flex-shrink: 0; }
     .camera-shutter:active { transform: scale(0.92); }
     .camera-flip { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; padding: 12px 16px; border-radius: 10px; cursor: pointer; }
-    .camera-ref-thumb { position: absolute; top: 16px; left: 16px; width: 96px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 10; cursor: pointer; }
+    .camera-ref-thumb { position: absolute; top: 16px; left: 16px; width: 96px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,0.5); z-index: 10; cursor: pointer; }
     .camera-ref-thumb img { width: 100%; height: 72px; object-fit: cover; display: block; }
     .camera-ref-label { background: rgba(0,0,0,0.7); color: #fff; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 6px; text-align: center; }
     .camera-ref-expanded { display: none; position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
@@ -115,105 +155,52 @@
     .camera-ref-expanded img { max-width: 90%; max-height: 80vh; border-radius: 12px; object-fit: contain; }
     .camera-ref-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 22px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    /* checklist */
-    .checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-    .check-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg); border-radius: 8px; cursor: pointer; transition: background 0.15s; }
-    .check-item:hover { background: #ede9e3; }
-    .check-item.checked { background: rgba(76,175,130,0.08); }
-    .check-box { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-    .check-item.checked .check-box { background: var(--green); border-color: var(--green); color: #fff; font-size: 12px; }
-    .check-text { font-size: 14px; color: var(--ink); font-weight: 500; }
-    .check-item.checked .check-text { text-decoration: line-through; color: var(--muted); }
-
-    /* confirm button */
-    .btn-confirm { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 14px; }
-    .btn-confirm:hover { background: var(--accent2); }
-    .btn-confirm:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-
-    /* main footer btn */
-    .btn-main { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
-    .btn-main:hover { background: var(--accent2); }
-    .btn-main:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-
-    /* ── ALERT SCREEN ── */
-    .alert-screen { background: var(--white); }
-    .alert-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
-    .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; padding: 4px; }
-    .alert-header-title { font-size: 16px; font-weight: 700; color: var(--ink); }
-    .alert-body { padding: 24px 20px; flex: 1; }
-    .alert-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-    .alert-option { padding: 14px 16px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 10px; }
-    .alert-option:hover { border-color: var(--red); color: var(--red); }
-    .alert-option.selected { border-color: var(--red); background: rgba(192,57,43,0.05); color: var(--red); }
-    .alert-textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; resize: none; transition: border-color 0.2s; margin-bottom: 16px; }
-    .alert-textarea:focus { border-color: var(--accent2); }
-    .btn-alert-send { width: 100%; padding: 15px; background: var(--red); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-
-    /* ── DONE SCREEN ── */
-    .done-screen { background: var(--accent); align-items: center; justify-content: center; text-align: center; padding: 48px 32px; }
-    .done-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 28px; }
-    .done-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-    .done-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 40px; line-height: 1.6; max-width: 300px; margin-left: auto; margin-right: auto; }
-    .done-summary { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; width: 100%; max-width: 320px; margin: 0 auto 32px; text-align: left; }
-    .done-summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 13px; }
-    .done-summary-row:last-child { border-bottom: none; }
-    .done-summary-row span { color: rgba(255,255,255,0.45); }
-    .done-summary-row strong { color: rgba(255,255,255,0.85); font-weight: 600; }
-
     /* ── TOAST ── */
-    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; white-space: nowrap; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 200; }
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; white-space: nowrap; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 400; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-<!-- IDENTIFY SCREEN -->
+<!-- IDENTIFY -->
 <div class="screen active" id="screen-identify">
-  <div class="id-screen" style="display:flex;flex-direction:column;flex:1">
+  <div class="id-screen">
     <div class="id-top">
       <div class="id-logo">MoveOps Store</div>
       <div class="id-icon">🏪</div>
-      <div class="id-brand" id="id-brand-name">Nike · SS26 Campaign</div>
-      <div class="id-title" id="id-title">Primavera Window Installation</div>
-      <div class="id-store" id="id-store-name" style="font-size:18px;font-weight:700;margin-top:4px">Loading…</div>
+      <div class="id-brand" id="id-brand-name">Loading…</div>
+      <div class="id-title" id="id-title">Installation</div>
+      <div class="id-store" id="id-store-name"></div>
     </div>
     <div class="id-bottom">
       <div class="id-label">Installation steps</div>
       <div class="id-steps-preview" id="id-steps-preview"></div>
-      <div class="id-gps">
-        <div class="id-gps-dot"></div>
-        <span>GPS location will be captured with each photo</span>
-      </div>
-      <button class="btn-start" onclick="startInstallation()">Start installation →</button>
+      <div class="id-gps"><div class="id-gps-dot"></div><span>GPS captured with each photo</span></div>
+      <button class="btn-start" id="btn-start" onclick="startInstallation()">Start installation →</button>
     </div>
   </div>
 </div>
 
-<!-- MAIN SCREEN -->
+<!-- MAIN -->
 <div class="screen" id="screen-main">
   <div class="main-header">
     <div class="main-header-top">
       <span class="header-logo">MoveOps Store</span>
       <button class="header-alert-btn" onclick="showAlert()">⚠ Report problem</button>
     </div>
-    <div class="progress-section">
-      <div class="progress-label">
-        <span id="progress-text">Step 1 of 4</span>
-        <strong id="progress-pct">0%</strong>
-      </div>
+    <div>
+      <div class="progress-label"><span id="progress-text">Step 1 of 4</span><strong id="progress-pct">0%</strong></div>
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
       <div class="progress-steps-row" id="progress-dots"></div>
     </div>
   </div>
-
   <div class="main-content" id="steps-container"></div>
-
   <div class="main-footer">
-    <button class="btn-main" id="btn-next" onclick="nextStep()">Complete step →</button>
+    <button class="btn-main" id="btn-next" onclick="nextStep()" disabled>Complete step →</button>
   </div>
 </div>
 
-<!-- ALERT SCREEN -->
+<!-- ALERT -->
 <div class="screen" id="screen-alert">
   <div class="alert-header">
     <button class="back-btn" onclick="showScreen('main')">←</button>
@@ -222,540 +209,499 @@
   <div class="alert-body">
     <div class="id-label" style="margin-bottom:12px">What's the issue?</div>
     <div class="alert-options">
-      <div class="alert-option" onclick="selectAlertType(this, 'missing')">📦 Material missing or incomplete</div>
-      <div class="alert-option" onclick="selectAlertType(this, 'damaged')">💥 Material arrived damaged</div>
-      <div class="alert-option" onclick="selectAlertType(this, 'access')">🚫 Cannot access installation area</div>
-      <div class="alert-option" onclick="selectAlertType(this, 'other')">💬 Other issue</div>
+      <div class="alert-option" onclick="selectAlertType(this,'missing')">📦 Material missing or incomplete</div>
+      <div class="alert-option" onclick="selectAlertType(this,'damaged')">💥 Material arrived damaged</div>
+      <div class="alert-option" onclick="selectAlertType(this,'access')">🚫 Cannot access installation area</div>
+      <div class="alert-option" onclick="selectAlertType(this,'other')">💬 Other issue</div>
     </div>
     <div class="id-label" style="margin-bottom:8px">Details (optional)</div>
-    <textarea class="alert-textarea" rows="4" placeholder="Describe the problem..." id="alert-text"></textarea>
+    <textarea class="alert-textarea" rows="4" placeholder="Describe the problem…" id="alert-text"></textarea>
     <button class="btn-alert-send" onclick="sendAlert()">Send alert to brand team</button>
   </div>
 </div>
 
-<!-- DONE SCREEN -->
+<!-- DONE -->
 <div class="screen" id="screen-done">
   <div class="done-screen" style="display:flex;flex-direction:column;flex:1">
     <div class="done-icon">✓</div>
     <div class="done-title">Installation complete!</div>
-    <div class="done-sub">All steps are done. The brand team has been notified and your photos are saved.</div>
+    <div class="done-sub">All steps are done. The brand team has been notified.</div>
     <div class="done-summary" id="done-summary"></div>
     <div style="color:rgba(255,255,255,0.35);font-size:12px">You can close this window.</div>
   </div>
 </div>
 
-
-<!-- CAMERA OVERLAY -->
+<!-- CAMERA -->
 <div class="camera-overlay" id="camera-overlay">
   <video id="camera-video" autoplay playsinline muted></video>
-  <!-- Reference thumbnail (only if step has refImage) -->
   <div class="camera-ref-thumb" id="camera-ref-thumb" style="display:none" onclick="expandRef()">
-    <img id="camera-ref-img" src="" alt="Reference">
+    <img id="camera-ref-img" src="" alt="">
     <div class="camera-ref-label">Reference</div>
   </div>
-  <!-- Expanded reference -->
   <div class="camera-ref-expanded" id="camera-ref-expanded" onclick="collapseRef()">
-    <img id="camera-ref-expanded-img" src="" alt="Reference">
+    <img id="camera-ref-expanded-img" src="" alt="">
     <button class="camera-ref-close" onclick="collapseRef()">×</button>
   </div>
   <canvas id="camera-canvas" style="display:none"></canvas>
   <div class="camera-bar">
     <button class="camera-cancel" onclick="closeCamera()">Cancel</button>
-    <button class="camera-shutter" id="camera-shutter" onclick="capturePhoto()"></button>
+    <button class="camera-shutter" onclick="capturePhoto()"></button>
     <button class="camera-flip" onclick="flipCamera()">🔄</button>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://ysltwsexfeweqjmzdahs.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzbHR3c2V4ZmV3ZXFqbXpkYWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjI4MjYsImV4cCI6MjA4ODYzODgyNn0.pgABlsoHBq9LkOqtJhXd-LF7XKMla_fgR1CbWAWpl_k';
+const SB  = 'https://ysltwsexfeweqjmzdahs.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzbHR3c2V4ZmV3ZXFqbXpkYWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjI4MjYsImV4cCI6MjA4ODYzODgyNn0.pgABlsoHBq9LkOqtJhXd-LF7XKMla_fgR1CbWAWpl_k';
+const H   = { apikey: KEY, Authorization: `Bearer ${KEY}` };
+const HJ  = { ...H, 'Content-Type': 'application/json' };
 
-const DEMO = {
-  'store1234': {
-    name: 'Primavera Window Installation',
-    brand: 'Nike · SS26 Campaign',
-    store: 'El Corte Inglés Sevilla',
-    pm_email: 'hello@moveops.services',
-    steps: [
-      { id:'s1', title:'Before photo', desc:'Photo of the installation area before starting', type:'photo', refImage:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=60' },
-      { id:'s2', title:'Confirm materials received', desc:'Check off all items in the shipment', type:'checklist', items:['Lateral panels x2','Central display','Vinyl stickers x10','Floor stand'] },
-      { id:'s3', title:'Display installed', desc:'Photo of the display in its final position', type:'photo', refImage:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=60' },
-      { id:'s4', title:'Final result', desc:'Wide photo of the complete installation', type:'photo', refImage:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=60' },
-    ]
-  },
-  'store5678': {
-    name: 'Air Max PLV Installation',
-    brand: 'Nike · Air Max Day',
-    store: 'Foot Locker Barcelona',
-    pm_email: 'hello@moveops.services',
-    steps: [
-      { id:'s1', title:'Before photo', desc:'Space before installation begins', type:'photo', refImage:null },
-      { id:'s2', title:'Material check', desc:'Confirm all PLV elements received', type:'checklist', items:['PLV banner x1','Stoppers x4','Price strips','Header card'] },
-      { id:'s3', title:'Installed', desc:'Photo of completed installation', type:'photo', refImage:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=60' },
-    ]
-  }
-};
+const api = (path, opts={}) => fetch(`${SB}/rest/v1/${path}`, { headers: H, ...opts });
+const post = (path, body) => fetch(`${SB}/rest/v1/${path}`, { method:'POST', headers: HJ, body: JSON.stringify(body) });
+const patch = (path, body) => fetch(`${SB}/rest/v1/${path}`, { method:'PATCH', headers: HJ, body: JSON.stringify(body) });
 
-let project = null;
-let currentStepIndex = 0;
-let stepStates = [];
-let gpsCoords = null;
-let alertType = null;
+let project     = null;
+let currentStep = 0;
+let stepStates  = [];
+let gpsCoords   = null;
+let alertType   = null;
+let camStream   = null;
+let camStep     = null;
+let facingMode  = 'environment';
+let reportId    = null;
+let startedAt   = null;
+let sigCtx      = null;
+let sigDirty    = false;
 
-// Get GPS
-navigator.geolocation?.getCurrentPosition(pos => {
-  gpsCoords = { lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) };
-}, () => {});
+navigator.geolocation?.getCurrentPosition(
+  p => { gpsCoords = { lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }; },
+  () => {}
+);
 
-// Init
+// ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  const params = new URLSearchParams(location.search);
-  const id      = params.get('project') || 'store1234';
-  const storeId = params.get('store') || null;
+  const params    = new URLSearchParams(location.search);
+  const projectId = params.get('project');
+  const storeId   = params.get('store');
 
-  if (DEMO[id]) {
-    project = DEMO[id];
-  } else {
-    try {
-      // Load project
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}&select=*`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      });
-      const data = await res.json();
+  if (!projectId) { showError('No project link. Please use the link from your PM.'); return; }
 
-      // Load store name if storeId present
-      let storeName = null;
-      let storeAddress = null;
-      if (storeId) {
-        try {
-          const sr = await fetch(`${SUPABASE_URL}/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=name,address,contact_name,contact_phone`, {
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-          });
-          if (sr.ok) {
-            const sd = await sr.json();
-            if (Array.isArray(sd) && sd[0]) {
-              storeName    = sd[0].name;
-              storeAddress = sd[0].address;
-            }
-          }
-        } catch(e){ console.warn('Store fetch failed:', e); }
+  try {
+    const pRes  = await api(`projects?id=eq.${projectId}&select=*`);
+    const pData = await pRes.json();
+    if (!pData[0]) { showError('Project not found.'); return; }
+    const p = pData[0];
+
+    let storeName = p.location || 'Store';
+    let storeAddress = '';
+    let materials = [];
+
+    if (storeId) {
+      const sRes  = await api(`stores?id=eq.${storeId}&select=name,address`);
+      const sData = await sRes.json();
+      if (sData[0]) { storeName = sData[0].name; storeAddress = sData[0].address || ''; }
+
+      // Load store materials with project_material join
+      const mRes  = await api(`store_materials?store_id=eq.${storeId}&select=quantity_planned,project_material_id,project_materials(id,name,unit,description)`);
+      const mData = await mRes.json();
+      if (Array.isArray(mData) && mData.length) {
+        materials = mData.map(m => ({
+          pmId:     m.project_material_id,
+          name:     m.project_materials?.name || 'Material',
+          unit:     m.project_materials?.unit || 'units',
+          desc:     m.project_materials?.description || '',
+          planned:  m.quantity_planned || 1,
+          received: m.quantity_planned || 1,
+          ok:       true,
+          notes:    ''
+        }));
       }
+    }
 
-      if (data[0]) {
-        const p = data[0];
-        project = {
-          name: p.name || 'Installation',
-          brand: p.client || 'Brand',
-          store: storeName || p.location || 'Store',
-          storeId: storeId,
-          storeAddress: storeAddress,
-          pm_email: p.pm_email || 'hello@moveops.services',
-          steps: [
-            { id:'s1', title:'Before photo', desc:'Photo of the space before installation', type:'photo', refImage:null },
-            { id:'s2', title:'Materials confirmed', desc:'All items received and checked', type:'checklist', items:['Main material','Fixings','Instructions'] },
-            { id:'s3', title:'Installation complete', desc:'Photo of the final result', type:'photo', refImage:null },
-          ]
-        };
-      }
-    } catch(e) {}
-    if (!project) project = DEMO['store1234'];
+    project = {
+      id: projectId, storeId,
+      name: p.client || 'Installation',
+      brand: p.client || 'Brand',
+      store: storeName, storeAddress,
+      pm_email: p.pm_email || 'hello@moveops.services',
+      materials,
+      steps: [
+        { id:'s1', title:'Before photo',        desc:'Photo of the space before starting',       type:'photo'     },
+        { id:'s2', title:'Materials received',  desc:'Confirm all materials received at store',  type:'materials' },
+        { id:'s3', title:'Contact & signature', desc:'Store contact name and signature',         type:'contact'   },
+        { id:'s4', title:'Installation complete', desc:'Photo of the final result',              type:'photo'     },
+      ]
+    };
+
+    stepStates = project.steps.map(() => ({ done: false, photo: null, photoUrl: null }));
+
+    document.getElementById('id-brand-name').textContent = project.brand;
+    document.getElementById('id-title').textContent      = project.name;
+    document.getElementById('id-store-name').textContent = project.store;
+    const preview = document.getElementById('id-steps-preview');
+    project.steps.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'id-step-dot';
+      if (i === 0) d.style.background = 'var(--accent2)';
+      preview.appendChild(d);
+    });
+
+  } catch(e) {
+    console.error(e);
+    showError('Could not load project. Check your connection.');
   }
-
-  stepStates = project.steps.map(() => ({ done: false, photo: null, checklist: [] }));
-
-  // Populate identify screen
-  document.getElementById('id-brand-name').textContent = project.brand;
-  document.getElementById('id-title').textContent = project.name;
-  document.getElementById('id-store-name').textContent = project.store !== project.brand ? project.store : '';
-  const preview = document.getElementById('id-steps-preview');
-  project.steps.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'id-step-dot';
-    if (i === 0) d.style.background = 'var(--accent2)';
-    preview.appendChild(d);
-  });
 });
 
-function startInstallation() {
+function showError(msg) {
+  document.getElementById('id-brand-name').textContent = 'MoveOps Store';
+  document.getElementById('id-title').textContent      = msg;
+  document.getElementById('id-store-name').textContent = '';
+  document.getElementById('btn-start').disabled        = true;
+}
+
+// ── START ──────────────────────────────────────────────────────────────────────
+async function startInstallation() {
+  startedAt = new Date().toISOString();
   showScreen('main');
   renderSteps();
   updateProgress();
+
+  try {
+    const res = await fetch(`${SB}/rest/v1/installation_reports`, {
+      method: 'POST',
+      headers: { ...HJ, Prefer: 'return=representation' },
+      body: JSON.stringify({
+        project_id: project.id,
+        store_id:   project.storeId || null,
+        store_name: project.store,
+        started_at: startedAt,
+        status:     'in_progress',
+        gps_lat:    gpsCoords?.lat || null,
+        gps_lng:    gpsCoords?.lng || null
+      })
+    });
+    if (res.ok) {
+      const d = await res.json();
+      reportId = Array.isArray(d) ? d[0]?.id : d?.id;
+    } else {
+      console.warn('Report create failed:', res.status, await res.text());
+    }
+  } catch(e) { console.error('Report create:', e); }
 }
 
+// ── SCREENS ──────────────────────────────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
+function showAlert() { showScreen('alert'); }
 
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderSteps() {
   const container = document.getElementById('steps-container');
   container.innerHTML = '';
-
-  // Progress dots
-  const dotsContainer = document.getElementById('progress-dots');
-  dotsContainer.innerHTML = '';
+  const dots = document.getElementById('progress-dots');
+  dots.innerHTML = '';
   project.steps.forEach((_, i) => {
     const d = document.createElement('div');
-    d.className = 'progress-step-dot' + (stepStates[i].done ? ' done' : i === currentStepIndex ? ' current' : '');
-    dotsContainer.appendChild(d);
+    d.className = 'progress-step-dot' + (stepStates[i].done ? ' done' : i === currentStep ? ' current' : '');
+    dots.appendChild(d);
   });
 
   project.steps.forEach((step, i) => {
-    const state = stepStates[i];
-    const isActive = i === currentStepIndex;
-    const isDone = state.done;
-    const isLocked = i > currentStepIndex;
-
+    const state  = stepStates[i];
+    const isActive = i === currentStep;
+    const isDone   = state.done;
+    const isLocked = i > currentStep;
     const card = document.createElement('div');
     card.className = 'step-card' + (isLocked ? ' locked' : isDone ? ' done-card' : isActive ? ' active-card' : '');
     card.id = 'step-card-' + i;
-
-    const numIcon = isDone ? '✓' : (i + 1);
     const numClass = isDone ? 'complete' : isActive ? 'active' : 'pending';
-
+    const typeTag = { photo:'📸 Photo required', materials:'📦 Materials checklist', contact:'✍️ Signature required' }[step.type] || '';
     let bodyHTML = '';
     if (isActive || isDone) {
-      bodyHTML = `<div class="step-body">`;
-
+      bodyHTML = '<div class="step-body">';
       if (step.type === 'photo') {
-        const hasPhoto = state.photo;
+        const hp = !!state.photo;
         bodyHTML += `
-          <div class="photo-zone ${hasPhoto ? 'has-photo' : ''}" id="zone-${i}" onclick="openCamera(${i})">
-            <div class="photo-zone-icon">${hasPhoto ? '✅' : '📸'}</div>
-            <div class="photo-zone-label">${hasPhoto ? 'Photo taken — tap to retake' : 'Tap to open camera'}</div>
-            <div class="photo-zone-sub">${hasPhoto ? '' : 'Camera opens full screen'}</div>
+          <div class="photo-zone ${hp ? 'has-photo':''}" onclick="openCamera(${i})">
+            <div class="photo-zone-icon">${hp ? '✅':'📸'}</div>
+            <div class="photo-zone-label">${hp ? 'Photo taken — tap to retake':'Tap to open camera'}</div>
+            <div class="photo-zone-sub">${hp ? '':'Camera opens full screen'}</div>
           </div>
-          ${hasPhoto ? `<img src="${hasPhoto}" class="photo-preview show" style="max-height:200px;object-fit:cover;border-radius:8px;margin-top:10px">` : ''}
-          <div class="photo-gps-tag ${gpsCoords && hasPhoto ? '' : 'hidden'}" id="gps-tag-${i}">📍 GPS: ${gpsCoords?.lat}, ${gpsCoords?.lng}</div>
-        `;
-      } else if (step.type === 'checklist') {
-        bodyHTML += `<div class="checklist" id="checklist-${i}">`;
-        step.items.forEach((item, j) => {
-          const checked = state.checklist[j];
-          bodyHTML += `
-            <div class="check-item ${checked ? 'checked' : ''}" onclick="toggleCheck(${i}, ${j})">
-              <div class="check-box">${checked ? '✓' : ''}</div>
-              <div class="check-text">${item}</div>
-            </div>`;
-        });
-        bodyHTML += `</div>`;
+          ${hp ? `<img src="${state.photo}" class="photo-preview show">` : ''}
+          <div class="photo-gps-tag ${gpsCoords && hp ? '':'hidden'}">📍 GPS: ${gpsCoords?.lat}, ${gpsCoords?.lng}</div>`;
+      } else if (step.type === 'materials') {
+        bodyHTML += renderMaterialsHTML();
+      } else if (step.type === 'contact') {
+        bodyHTML += `
+          <div class="contact-section">
+            <div>
+              <label class="contact-label">Store contact name</label>
+              <input class="contact-input" type="text" id="contact-name" placeholder="Name of person present" oninput="updateNextBtn()">
+            </div>
+            <div class="sig-wrap">
+              <label class="contact-label">Signature</label>
+              <div class="sig-pad-outer">
+                <div class="sig-hint-txt" id="sig-hint">Sign here</div>
+                <canvas id="sig-canvas" height="140"></canvas>
+              </div>
+              <button class="sig-clear" onclick="clearSig()">Clear signature</button>
+            </div>
+          </div>`;
       }
-
-      if (!isDone) {
-        bodyHTML += `<button class="btn-confirm" id="confirm-btn-${i}" onclick="confirmStep(${i})" ${canConfirm(i) ? '' : 'disabled'}>Confirm step ✓</button>`;
-      }
-
-      bodyHTML += `</div>`;
+      if (!isDone) bodyHTML += `<button class="btn-confirm" id="confirm-btn-${i}" onclick="confirmStep(${i})" ${canConfirm(i)?'':'disabled'}>Confirm step ✓</button>`;
+      bodyHTML += '</div>';
     }
-
     card.innerHTML = `
       <div class="step-header">
-        <div class="step-num-badge ${numClass}">${numIcon}</div>
+        <div class="step-num-badge ${numClass}">${isDone?'✓':(i+1)}</div>
         <div class="step-info">
           <div class="step-title">${step.title}</div>
           <div class="step-desc">${step.desc}</div>
-          <div class="step-type-tag">${step.type === 'photo' ? '📸 Photo required' : '☑ Checklist'}</div>
+          <div class="step-type-tag">${typeTag}</div>
         </div>
-      </div>
-      ${bodyHTML}
-    `;
+      </div>${bodyHTML}`;
     container.appendChild(card);
   });
 
   updateNextBtn();
+  const ci = project.steps.findIndex(s => s.type === 'contact');
+  if (currentStep === ci && !stepStates[ci]?.done) setTimeout(initSigPad, 50);
 }
 
+function renderMaterialsHTML() {
+  const mats = project.materials;
+  if (!mats.length) return `<div class="mat-no-items">No materials set for this store.<br><small>Ask your PM to add them in the dashboard.</small></div>`;
+  let html = '<div class="materials-list">';
+  mats.forEach((m, j) => {
+    html += `
+      <div class="mat-item ${!m.ok ? 'has-issue':''}" id="mat-${j}">
+        <div class="mat-item-row">
+          <div class="mat-status ${m.ok?'ok':'nok'}" onclick="toggleMat(${j})">${m.ok?'✓':'✗'}</div>
+          <div class="mat-info">
+            <div class="mat-name">${m.name}</div>
+            <div class="mat-planned">Planned: ${m.planned} ${m.unit}</div>
+          </div>
+          <div class="mat-qty-wrap">
+            <button class="mat-qty-btn" onclick="changeQty(${j},-1)">−</button>
+            <div class="mat-qty-val" id="mq-${j}">${m.received}</div>
+            <button class="mat-qty-btn" onclick="changeQty(${j},+1)">+</button>
+          </div>
+        </div>
+        <input class="mat-notes-input" type="text" id="mn-${j}" placeholder="What's wrong?" value="${m.notes}" oninput="project.materials[${j}].notes=this.value">
+      </div>`;
+  });
+  return html + '</div>';
+}
+
+// ── MATERIALS ─────────────────────────────────────────────────────────────────
+function toggleMat(j) {
+  project.materials[j].ok = !project.materials[j].ok;
+  const item = document.getElementById('mat-' + j);
+  const btn  = item?.querySelector('.mat-status');
+  if (btn) { btn.className = 'mat-status ' + (project.materials[j].ok ? 'ok' : 'nok'); btn.textContent = project.materials[j].ok ? '✓' : '✗'; }
+  item?.classList.toggle('has-issue', !project.materials[j].ok);
+}
+function changeQty(j, d) {
+  project.materials[j].received = Math.max(0, (project.materials[j].received || 0) + d);
+  const el = document.getElementById('mq-' + j);
+  if (el) el.textContent = project.materials[j].received;
+}
+
+// ── SIGNATURE PAD ─────────────────────────────────────────────────────────────
+function initSigPad() {
+  const c = document.getElementById('sig-canvas');
+  if (!c) return;
+  c.width = c.offsetWidth;
+  sigCtx = c.getContext('2d');
+  sigCtx.strokeStyle = '#0D0D0D'; sigCtx.lineWidth = 2.5; sigCtx.lineCap = 'round'; sigCtx.lineJoin = 'round';
+  let painting = false;
+  const pos = e => { const r = c.getBoundingClientRect(); const s = e.touches?.[0] || e; return { x: s.clientX-r.left, y: s.clientY-r.top }; };
+  c.addEventListener('pointerdown', e => { painting=true; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x,p.y); document.getElementById('sig-hint').style.display='none'; e.preventDefault(); });
+  c.addEventListener('pointermove', e => { if(!painting) return; const p=pos(e); sigCtx.lineTo(p.x,p.y); sigCtx.stroke(); e.preventDefault(); });
+  c.addEventListener('pointerup',   () => { painting=false; sigDirty=true; updateNextBtn(); });
+  c.addEventListener('pointerleave',() => { painting=false; });
+}
+function clearSig() {
+  const c = document.getElementById('sig-canvas');
+  if (c && sigCtx) { sigCtx.clearRect(0,0,c.width,c.height); sigDirty=false; document.getElementById('sig-hint').style.display=''; updateNextBtn(); }
+}
+function hasSig() { return sigDirty; }
+
+// ── FLOW ──────────────────────────────────────────────────────────────────────
 function canConfirm(i) {
-  const step = project.steps[i];
-  const state = stepStates[i];
-  if (step.type === 'photo') return !!state.photo;
-  if (step.type === 'checklist') return step.items.every((_, j) => state.checklist[j]);
+  const step = project.steps[i]; const state = stepStates[i];
+  if (step.type === 'photo')     return !!state.photo;
+  if (step.type === 'materials') return true;
+  if (step.type === 'contact')   return !!(document.getElementById('contact-name')?.value?.trim() && hasSig());
   return true;
 }
-
-// ── CAMERA ──
-let cameraStepIndex = null;
-let cameraStream = null;
-let facingMode = 'environment';
-
-async function openCamera(i) {
-  cameraStepIndex = i;
-  const step = project.steps[i];
-  const overlay = document.getElementById('camera-overlay');
-  const thumb = document.getElementById('camera-ref-thumb');
-  const refImg = document.getElementById('camera-ref-img');
-  const expandedImg = document.getElementById('camera-ref-expanded-img');
-
-  // Set reference image if available
-  if (step.refImage) {
-    refImg.src = step.refImage;
-    expandedImg.src = step.refImage;
-    thumb.style.display = 'block';
-  } else {
-    thumb.style.display = 'none';
-  }
-
-  overlay.classList.add('open');
-  await startCameraStream();
+function updateNextBtn() {
+  const btn = document.getElementById('btn-next'); if (!btn) return;
+  const allDone = stepStates.every(s=>s.done);
+  if (allDone) { btn.textContent='✓ All done'; btn.disabled=false; return; }
+  btn.disabled = !canConfirm(currentStep);
+  btn.textContent = currentStep === project.steps.length-1 ? 'Complete installation ✓' : 'Complete step →';
+  const cb = document.getElementById('confirm-btn-' + currentStep);
+  if (cb) cb.disabled = !canConfirm(currentStep);
 }
-
-async function startCameraStream() {
-  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); }
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false
-    });
-    document.getElementById('camera-video').srcObject = cameraStream;
-  } catch(e) {
-    closeCamera();
-    showToast('Camera not available');
-  }
-}
-
-async function flipCamera() {
-  facingMode = facingMode === 'environment' ? 'user' : 'environment';
-  await startCameraStream();
-}
-
-function closeCamera() {
-  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-  document.getElementById('camera-overlay').classList.remove('open');
-  document.getElementById('camera-ref-expanded').classList.remove('open');
-  cameraStepIndex = null;
-}
-
-async function uploadPhotoToStorage(dataUrl, stepIndex) {
-  try {
-    // Convert dataUrl to blob
-    const res  = await fetch(dataUrl);
-    const blob = await res.blob();
-    const ext  = 'jpg';
-    const projectId = new URLSearchParams(location.search).get('project') || 'store1234';
-    const storeId   = new URLSearchParams(location.search).get('store') || 'unknown';
-    const filename  = `${projectId}/${storeId}/step${stepIndex+1}_${Date.now()}.${ext}`;
-
-    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/photos/${filename}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'image/jpeg',
-        'x-upsert': 'true'
-      },
-      body: blob
-    });
-
-    if (!r.ok) {
-      const err = await r.text();
-      console.warn('Photo upload failed:', err);
-      return null;
-    }
-
-    // Return public URL
-    return `${SUPABASE_URL}/storage/v1/object/public/photos/${filename}`;
-  } catch(e) {
-    console.warn('Photo upload error:', e);
-    return null;
-  }
-}
-
-function capturePhoto() {
-  const video = document.getElementById('camera-video');
-  const canvas = document.getElementById('camera-canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-  const i = cameraStepIndex;
-  closeCamera();
-  stepStates[i].photo = dataUrl;
-  renderSteps();
-  showToast('📍 Uploading photo…');
-
-  // Upload to Supabase Storage in background
-  uploadPhotoToStorage(dataUrl, i).then(url => {
-    if (url) {
-      stepStates[i].photoUrl = url;
-      showToast('✓ Photo saved');
-      // Post photo alert to dashboard
-      const projectId = new URLSearchParams(location.search).get('project') || 'store1234';
-      fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
-        body: JSON.stringify({
-          project_id: projectId,
-          type: 'photo',
-          message: `Photo: ${project?.steps?.[i]?.title || 'Step ' + (i+1)}`,
-          sent_by: project?.store || 'Store',
-          installer_name: project?.store || 'Store',
-          store_id: project?.storeId || null,
-          photo_url: url,
-          gps_lat: gpsCoords?.lat || null,
-          gps_lng: gpsCoords?.lng || null,
-          pm_email: project?.pm_email || 'hello@moveops.services'
-        })
-      }).catch(e => console.warn('Photo alert failed:', e));
-    } else {
-      showToast('⚠ Photo saved locally only');
-    }
-  });
-}
-
-function expandRef() {
-  document.getElementById('camera-ref-expanded').classList.add('open');
-}
-function collapseRef(e) {
-  document.getElementById('camera-ref-expanded').classList.remove('open');
-}
-
-function handlePhoto(i, input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const dataUrl = e.target.result;
-    stepStates[i].photo = dataUrl;
-    renderSteps();
-    showToast('📍 Uploading photo…');
-    uploadPhotoToStorage(dataUrl, i).then(url => {
-      if (url) {
-        stepStates[i].photoUrl = url;
-        showToast('✓ Photo saved');
-        const projectId = new URLSearchParams(location.search).get('project') || 'store1234';
-        fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
-          body: JSON.stringify({
-            project_id: projectId,
-            type: 'photo',
-            message: `Photo: ${project?.steps?.[i]?.title || 'Step ' + (i+1)}`,
-            sent_by: project?.store || 'Store',
-            installer_name: project?.store || 'Store',
-            store_id: project?.storeId || null,
-            photo_url: url,
-            gps_lat: gpsCoords?.lat || null,
-            gps_lng: gpsCoords?.lng || null,
-            pm_email: project?.pm_email || 'hello@moveops.services'
-          })
-        }).catch(e => console.warn('Photo alert failed:', e));
-      }
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
-function toggleCheck(i, j) {
-  stepStates[i].checklist[j] = !stepStates[i].checklist[j];
-  renderSteps();
-}
-
 function confirmStep(i) {
   if (!canConfirm(i)) return;
   stepStates[i].done = true;
-  if (i < project.steps.length - 1) {
-    currentStepIndex = i + 1;
-    renderSteps();
-    updateProgress();
-    showToast('✓ Step complete!');
-    setTimeout(() => {
-      document.getElementById('step-card-' + (i + 1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
-  } else {
-    updateProgress();
-    renderSteps();
-    setTimeout(() => finishInstallation(), 600);
-  }
+  if (i < project.steps.length-1) {
+    currentStep = i+1; renderSteps(); updateProgress(); showToast('✓ Step complete!');
+    setTimeout(() => document.getElementById('step-card-'+currentStep)?.scrollIntoView({behavior:'smooth',block:'start'}), 200);
+  } else { updateProgress(); renderSteps(); setTimeout(finishInstallation, 600); }
 }
-
-function nextStep() { confirmStep(currentStepIndex); }
-
-function updateNextBtn() {
-  const btn = document.getElementById('btn-next');
-  const allDone = stepStates.every(s => s.done);
-  if (allDone) { btn.textContent = '✓ All done'; btn.disabled = false; return; }
-  btn.disabled = !canConfirm(currentStepIndex);
-  btn.textContent = currentStepIndex === project.steps.length - 1 ? 'Complete installation ✓' : 'Complete step →';
-}
-
+function nextStep() { confirmStep(currentStep); }
 function updateProgress() {
-  const done = stepStates.filter(s => s.done).length;
-  const total = project.steps.length;
-  const pct = Math.round((done / total) * 100);
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-pct').textContent = pct + '%';
-  document.getElementById('progress-text').textContent = `Step ${Math.min(done + 1, total)} of ${total}`;
+  const done=stepStates.filter(s=>s.done).length, total=project.steps.length, pct=Math.round(done/total*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-pct').textContent=pct+'%';
+  document.getElementById('progress-text').textContent=`Step ${Math.min(done+1,total)} of ${total}`;
 }
 
-async function finishInstallation() {
+// ── CAMERA ────────────────────────────────────────────────────────────────────
+async function openCamera(i) {
+  camStep = i;
+  const ref = project.steps[i]?.refImage;
+  const thumb = document.getElementById('camera-ref-thumb');
+  if (ref) { document.getElementById('camera-ref-img').src=ref; document.getElementById('camera-ref-expanded-img').src=ref; thumb.style.display='block'; }
+  else thumb.style.display='none';
+  document.getElementById('camera-overlay').classList.add('open');
+  await startCam();
+}
+async function startCam() {
+  if (camStream) camStream.getTracks().forEach(t=>t.stop());
+  try { camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode,width:{ideal:1920},height:{ideal:1080}},audio:false}); document.getElementById('camera-video').srcObject=camStream; }
+  catch(e) { closeCamera(); showToast('Camera not available'); }
+}
+async function flipCamera() { facingMode=facingMode==='environment'?'user':'environment'; await startCam(); }
+function closeCamera() { if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} document.getElementById('camera-overlay').classList.remove('open'); camStep=null; }
+function expandRef()   { document.getElementById('camera-ref-expanded').classList.add('open'); }
+function collapseRef() { document.getElementById('camera-ref-expanded').classList.remove('open'); }
+
+async function uploadPhoto(dataUrl, stepIdx) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
-      body: JSON.stringify({
-        project_id: new URLSearchParams(location.search).get('project') || 'store1234',
-        type: 'store',
-        message: `Installation complete — ${project.store}`,
-        installer_name: project.store,
-        sent_by: project.store,
-        store_id: project.storeId || null,
-        gps_lat: gpsCoords?.lat || null,
-        gps_lng: gpsCoords?.lng || null,
-        pm_email: project.pm_email
-      })
+    const blob = await (await fetch(dataUrl)).blob();
+    const fname = `${project.id}/${project.storeId||'ns'}/step${stepIdx+1}_${Date.now()}.jpg`;
+    const r = await fetch(`${SB}/storage/v1/object/photos/${fname}`, {
+      method:'POST', headers:{...H,'Content-Type':'image/jpeg','x-upsert':'true'}, body:blob
+    });
+    return r.ok ? `${SB}/storage/v1/object/public/photos/${fname}` : null;
+  } catch(e) { return null; }
+}
+
+async function savePhotoRecord(url, stepIdx) {
+  if (!reportId || !url) return;
+  try {
+    await post('report_photos', {
+      report_id: reportId, step_index: stepIdx,
+      step_title: project.steps[stepIdx]?.title || '',
+      photo_url: url, gps_lat: gpsCoords?.lat||null, gps_lng: gpsCoords?.lng||null,
+      taken_at: new Date().toISOString()
+    });
+  } catch(e) {}
+}
+
+function capturePhoto() {
+  const video=document.getElementById('camera-video'), canvas=document.getElementById('camera-canvas');
+  canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0);
+  const dataUrl=canvas.toDataURL('image/jpeg',0.85);
+  const i=camStep; closeCamera();
+  stepStates[i].photo=dataUrl; renderSteps(); showToast('📍 Uploading…');
+  uploadPhoto(dataUrl,i).then(url=>{
+    if(url){stepStates[i].photoUrl=url; showToast('✓ Photo saved'); savePhotoRecord(url,i);}
+    else showToast('⚠ Saved locally only');
+    updateNextBtn();
+  });
+}
+
+// ── FINISH ────────────────────────────────────────────────────────────────────
+async function finishInstallation() {
+  const completedAt  = new Date().toISOString();
+  const contactName  = document.getElementById('contact-name')?.value?.trim() || '';
+  const sigCanvas    = document.getElementById('sig-canvas');
+
+  // Upload signature
+  let sigUrl = null;
+  if (sigCanvas && hasSig()) {
+    try {
+      const blob = await (await fetch(sigCanvas.toDataURL('image/png'))).blob();
+      const fname = `${project.id}/${project.storeId||'ns'}/sig_${Date.now()}.png`;
+      const r = await fetch(`${SB}/storage/v1/object/photos/${fname}`, {
+        method:'POST', headers:{...H,'Content-Type':'image/png','x-upsert':'true'}, body:blob
+      });
+      if (r.ok) sigUrl = `${SB}/storage/v1/object/public/photos/${fname}`;
+    } catch(e) {}
+  }
+
+  // Update report
+  if (reportId) {
+    try {
+      await patch(`installation_reports?id=eq.${reportId}`, {
+        completed_at:   completedAt,
+        contact_name:   contactName || null,
+        contact_signed: !!sigUrl,
+        status:         'complete',
+        gps_lat:        gpsCoords?.lat||null,
+        gps_lng:        gpsCoords?.lng||null,
+        notes:          sigUrl ? `signature:${sigUrl}` : null
+      });
+    } catch(e) { console.error(e); }
+
+    // Save materials
+    for (const m of project.materials) {
+      try {
+        await post('report_materials', {
+          report_id: reportId, project_material_id: m.pmId||null,
+          material_name: m.name, quantity_planned: m.planned,
+          quantity_received: m.received, ok: m.ok, notes: m.notes||null
+        });
+      } catch(e) {}
+    }
+  }
+
+  // Completion alert
+  try {
+    await post('alerts', {
+      project_id: project.id, type:'completion',
+      message:`Installation complete — ${project.store}`,
+      sent_by: project.store, store_id: project.storeId||null,
+      status:'active', gps_lat:gpsCoords?.lat||null, gps_lng:gpsCoords?.lng||null
     });
   } catch(e) {}
 
-  const photoCount = stepStates.filter(s => s.photo).length;
+  const photoCount = stepStates.filter(s=>s.photo).length;
+  const matOk      = project.materials.filter(m=>m.ok).length;
+  const matTotal   = project.materials.length;
+  const durMin     = startedAt ? Math.round((Date.now()-new Date(startedAt))/60000) : null;
+
   document.getElementById('done-summary').innerHTML = `
     <div class="done-summary-row"><span>Store</span><strong>${project.store}</strong></div>
     <div class="done-summary-row"><span>Campaign</span><strong>${project.name}</strong></div>
-    <div class="done-summary-row"><span>Steps completed</span><strong>${project.steps.length} / ${project.steps.length}</strong></div>
-    <div class="done-summary-row"><span>Photos uploaded</span><strong>${photoCount}</strong></div>
-    <div class="done-summary-row"><span>GPS verified</span><strong>${gpsCoords ? '✓ Yes' : 'Not available'}</strong></div>
-  `;
+    <div class="done-summary-row"><span>Steps</span><strong>${project.steps.length}/${project.steps.length}</strong></div>
+    <div class="done-summary-row"><span>Photos</span><strong>${photoCount}</strong></div>
+    ${matTotal>0?`<div class="done-summary-row"><span>Materials OK</span><strong>${matOk}/${matTotal}</strong></div>`:''}
+    ${contactName?`<div class="done-summary-row"><span>Signed by</span><strong>${contactName}</strong></div>`:''}
+    ${durMin!==null?`<div class="done-summary-row"><span>Duration</span><strong>${durMin} min</strong></div>`:''}
+    <div class="done-summary-row"><span>GPS</span><strong>${gpsCoords?`✓ ${gpsCoords.lat}, ${gpsCoords.lng}`:'Not available'}</strong></div>`;
   showScreen('done');
 }
 
-// Alert
-function showAlert() { showScreen('alert'); }
-function selectAlertType(el, type) {
-  document.querySelectorAll('.alert-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  alertType = type;
-}
+// ── ALERT ─────────────────────────────────────────────────────────────────────
+function selectAlertType(el, t) { document.querySelectorAll('.alert-option').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); alertType=t; }
 async function sendAlert() {
-  const msg = document.getElementById('alert-text').value.trim();
-  const type = alertType || 'other';
-  try {
-    await fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
-      body: JSON.stringify({
-        project_id: new URLSearchParams(location.search).get('project') || 'store1234',
-        type: 'store',
-        message: `[${type.toUpperCase()}] ${msg || 'No details provided'} — ${project?.store}`,
-        installer_name: project?.store || 'Store',
-        sent_by: project?.store || 'Store',
-        gps_lat: gpsCoords?.lat || null,
-        gps_lng: gpsCoords?.lng || null,
-        pm_email: project?.pm_email || 'hello@moveops.services'
-      })
-    });
-  } catch(e) {}
-  showScreen('main');
-  showToast('⚠ Alert sent to brand team');
+  const msg=document.getElementById('alert-text').value.trim();
+  try { await post('alerts', { project_id:project?.id||'', type:alertType||'other', message:`[${(alertType||'other').toUpperCase()}] ${msg||'No details'} — ${project?.store||''}`, sent_by:project?.store||'Store', store_id:project?.storeId||null, status:'active', gps_lat:gpsCoords?.lat||null, gps_lng:gpsCoords?.lng||null }); } catch(e){}
+  showScreen('main'); showToast('⚠ Alert sent to brand team');
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 </script>
 </body>
 </html>
