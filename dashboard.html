@@ -282,6 +282,83 @@
     .print-logo{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--accent);margin-bottom:4px;}
     .print-title{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:var(--ink);}
     .print-meta{font-size:12px;color:var(--muted);margin-top:4px;}
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────────────────── */
+
+    /* Hamburger button — hidden on desktop */
+    .hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;color:var(--ink);flex-shrink:0;}
+    .hamburger svg{display:block;}
+
+    /* Sidebar overlay for mobile */
+    .sidebar-overlay{display:none;position:fixed;inset:0;z-index:149;background:rgba(0,0,0,.4);}
+    .sidebar-overlay.open{display:block;}
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+
+      /* Sidebar becomes off-canvas drawer */
+      .sidebar {
+        position: fixed; left: 0; top: 0; bottom: 0; z-index: 150;
+        transform: translateX(-100%); transition: transform .25s ease;
+        height: 100vh; box-shadow: 4px 0 24px rgba(0,0,0,.12);
+      }
+      .sidebar.open { transform: translateX(0); }
+
+      /* Main takes full width */
+      .main { height: 100vh; width: 100%; }
+
+      /* Topbar: show hamburger */
+      .hamburger { display: flex; align-items: center; justify-content: center; }
+      .topbar { padding: 0 16px; gap: 12px; }
+
+      /* Content padding */
+      .content { padding: 20px 16px; }
+
+      /* Stats row: 2 cols on tablet, 1 col on phone */
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+
+      /* Overview grid: single col */
+      .overview-grid { grid-template-columns: 1fr; }
+
+      /* Detail grid: single col */
+      .detail-grid { grid-template-columns: 1fr; }
+
+      /* Store activity table: simplify columns */
+      .table-head { grid-template-columns: 1fr 100px 100px; }
+      .store-row  { grid-template-columns: 1fr 100px 100px; }
+      .table-head span:last-child, .store-row > *:last-child { display: none; }
+
+      /* Form row: single col */
+      .form-row { grid-template-columns: 1fr; }
+
+      /* Detail header */
+      .detail-header-row { flex-direction: column; align-items: flex-start; }
+      .detail-title { font-size: 22px; }
+
+      /* Campaign card meta wraps */
+      .campaign-card-header { flex-wrap: wrap; gap: 8px; }
+
+      /* Modal: full-width on mobile */
+      .modal { padding: 28px 20px; border-radius: 14px 14px 0 0; align-self: flex-end; width: 100%; max-width: 100%; max-height: 92vh; }
+      .modal-overlay { align-items: flex-end; }
+
+      /* Store modal full screen */
+      .store-modal-box { width: 100%; max-width: 100%; max-height: 92vh; border-radius: 14px 14px 0 0; }
+      .store-modal-overlay { align-items: flex-end; }
+
+      /* Toast */
+      .toast { bottom: 16px; right: 16px; left: 16px; }
+    }
+
+    @media (max-width: 540px) {
+      .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat-val { font-size: 28px; }
+      .topbar-actions .btn-sm span { display: none; } /* hide label on tiny screens */
+      .table-head { grid-template-columns: 1fr 90px; }
+      .store-row  { grid-template-columns: 1fr 90px; }
+      .table-head span:nth-child(3), .store-row > *:nth-child(3) { display: none; }
+      .photo-grid { grid-template-columns: repeat(2,1fr); }
+    }
   </style>
 </head>
 <body>
@@ -312,8 +389,16 @@
   </div>
 </aside>
 
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <main class="main">
   <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="4" width="16" height="2" rx="1" fill="currentColor"/>
+        <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor"/>
+        <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
     <div class="topbar-title" id="topbar-title">Overview</div>
     <div class="topbar-actions">
       <button class="btn-sm ghost" id="btn-export" onclick="exportReport()" style="display:none">↓ Export PDF</button>
@@ -1404,6 +1489,19 @@ async function createCampaign() {
 }
 
 loadAll();
+
+// ── SIDEBAR TOGGLE (mobile) ──────────────────────────────────────────────
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+document.querySelectorAll('.nav-item').forEach(el =>
+  el.addEventListener('click', () => { if (window.innerWidth <= 900) closeSidebar(); })
+);
 </script>
 </body>
 </html>

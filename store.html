@@ -166,6 +166,20 @@
     /* ── TOAST ── */
     .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; white-space: nowrap; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 400; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── RESPONSIVE (tablet/desktop) ───────────────────────────────────────── */
+    @media (min-width: 600px) {
+      .app { max-width: 480px; margin: 0 auto; min-height: 100vh; box-shadow: 0 0 48px rgba(0,0,0,.10); }
+      .camera-bar { max-width: 480px; left: 50%; transform: translateX(-50%); }
+      .id-screen { max-width: 480px; margin: 0 auto; }
+      .done-screen { max-width: 480px; margin: 0 auto; }
+    }
+
+    @media (min-width: 900px) {
+      body { background: var(--bg); display: flex; align-items: flex-start; justify-content: center; padding: 40px 0; min-height: 100vh; }
+      .app { border-radius: 24px; overflow: hidden; min-height: auto; box-shadow: 0 8px 48px rgba(0,0,0,.15); }
+      .camera-bar { border-radius: 0 0 24px 24px; }
+    }
   </style>
 </head>
 <body>
