@@ -289,10 +289,56 @@ navigator.geolocation?.getCurrentPosition(
 );
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+const IS_DEMO = new URLSearchParams(location.search).has('demo');
+
+const DEMO_STORE_DATA = {
+  id: 'demo-project-1', storeId: 'ds1',
+  name: 'Nike SS26 — Window Campaign Spain',
+  brand: 'Nike', store: 'El Corte Inglés Castellana',
+  storeAddress: 'P.º de la Castellana, 42, Madrid',
+  pm_email: 'brand@nike.com',
+  duringPhotos: 2,
+  materials: [
+    { pmId:'dm1', name:'Lateral panels',  unit:'units', planned:2,  received:2,  ok:true,  notes:'' },
+    { pmId:'dm2', name:'Central display', unit:'units', planned:1,  received:1,  ok:true,  notes:'' },
+    { pmId:'dm3', name:'Vinyl stickers',  unit:'units', planned:10, received:10, ok:true,  notes:'' },
+    { pmId:'dm4', name:'Floor stand',     unit:'units', planned:1,  received:1,  ok:true,  notes:'' },
+  ]
+};
+
 window.addEventListener('load', async () => {
   const params    = new URLSearchParams(location.search);
   const projectId = params.get('project');
   const storeId   = params.get('store');
+
+  if (IS_DEMO) {
+    const d = DEMO_STORE_DATA;
+    const steps = [
+      { id:'s_before', title:'Before photo', desc:'Photo of the space before installation starts', type:'photo' },
+      { id:'s_during_0', title:'Installation photo 1 of 2', desc:'Photo showing installation in progress', type:'photo' },
+      { id:'s_during_1', title:'Installation photo 2 of 2', desc:'Photo showing installation in progress', type:'photo' },
+      { id:'s_mat',  title:'Materials received',  desc:'Confirm all materials received at this store', type:'materials' },
+      { id:'s_cont', title:'Contact & signature', desc:'Store contact name and signature',             type:'contact'   },
+      { id:'s_after',title:'After photo',         desc:'Photo of the completed installation',          type:'photo'     }
+    ];
+    project = { ...d, steps };
+    stepStates = steps.map(() => ({ done:false, photo:null, photoUrl:null }));
+    document.getElementById('id-brand-name').textContent = project.brand;
+    document.getElementById('id-title').textContent      = project.name;
+    document.getElementById('id-store-name').textContent = project.store;
+    const preview = document.getElementById('id-steps-preview');
+    steps.forEach((_, i) => {
+      const dot = document.createElement('div'); dot.className = 'id-step-dot';
+      if (i === 0) dot.style.background = 'var(--accent2)';
+      preview.appendChild(dot);
+    });
+    // Demo banner
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#C9A84C;color:#fff;text-align:center;padding:6px 16px;font-size:11px;font-weight:700;font-family:"DM Mono",monospace;letter-spacing:1px;';
+    banner.textContent = '⚡ DEMO — store.moveops.services';
+    document.body.prepend(banner);
+    return;
+  }
 
   if (!projectId) { showError('No project link. Please use the link from your PM.'); return; }
 
@@ -311,7 +357,6 @@ window.addEventListener('load', async () => {
       const sData = await sRes.json();
       if (sData[0]) { storeName = sData[0].name; storeAddress = sData[0].address || ''; }
 
-      // Load store materials with project_material join
       const mRes  = await api(`store_materials?store_id=eq.${storeId}&select=quantity_planned,project_material_id,project_materials(id,name,unit,description)`);
       const mData = await mRes.json();
       if (Array.isArray(mData) && mData.length) {
@@ -671,6 +716,7 @@ function expandRef()   { document.getElementById('camera-ref-expanded').classLis
 function collapseRef() { document.getElementById('camera-ref-expanded').classList.remove('open'); }
 
 async function uploadPhoto(dataUrl, stepIdx) {
+  if (IS_DEMO) return dataUrl; // use local data URL directly in demo
   try {
     const blob = await (await fetch(dataUrl)).blob();
     const fname = `${project.id}/${project.storeId||'ns'}/step${stepIdx+1}_${Date.now()}.jpg`;
@@ -726,8 +772,8 @@ async function finishInstallation() {
     } catch(e) {}
   }
 
-  // Update report
-  if (reportId) {
+  // Update report (skip in demo)
+  if (reportId && !IS_DEMO) {
     try {
       await patch(`installation_reports?id=eq.${reportId}`, {
         completed_at:   completedAt,
@@ -752,15 +798,8 @@ async function finishInstallation() {
     }
   }
 
-  // Completion alert
-  try {
-    await post('alerts', {
-      project_id: project.id, type:'completion',
-      message:`Installation complete — ${project.store}`,
-      sent_by: project.store, store_id: project.storeId||null,
-      status:'active', gps_lat:gpsCoords?.lat||null, gps_lng:gpsCoords?.lng||null
-    });
-  } catch(e) {}
+  // Completion alert (skip in demo)
+  if (!IS_DEMO) { try { await post('alerts', { project_id: project.id, type:'completion', message:`Installation complete — ${project.store}`, sent_by: project.store, store_id: project.storeId||null, status:'active', gps_lat:gpsCoords?.lat||null, gps_lng:gpsCoords?.lng||null }); } catch(e) {} }
 
   const photoCount = stepStates.filter(s=>s.photo).length;
   const matOk      = project.materials.filter(m=>m.ok).length;

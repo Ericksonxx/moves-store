@@ -513,17 +513,29 @@
 </div>
 
 <script>
+// ── DEMO MODE ─────────────────────────────────────────
+const IS_DEMO = new URLSearchParams(location.search).has('demo');
+
 // ── AUTH GUARD ────────────────────────────────────────
-const _token = sessionStorage.getItem('sb_token');
-if (!_token) window.location.href = 'login.html';
-const _user = JSON.parse(sessionStorage.getItem('sb_user') || '{}');
-if (_user.email) {
-  document.querySelector('.user-name').textContent = _user.email.split('@')[0];
-  document.querySelector('.user-role').textContent = _user.email;
-}
+const _token = IS_DEMO ? 'demo' : sessionStorage.getItem('sb_token');
+if (!IS_DEMO && !_token) window.location.href = 'login.html';
+const _user = IS_DEMO
+  ? { email: 'brand@nike.com', id: 'demo' }
+  : JSON.parse(sessionStorage.getItem('sb_user') || '{}');
+
+document.querySelector('.user-name').textContent = IS_DEMO ? 'Nike Brand Team' : (_user.email||'').split('@')[0];
+document.querySelector('.user-role').textContent  = IS_DEMO ? 'brand@nike.com' : (_user.email||'');
 const _sidebarAvatar = document.getElementById('sidebar-avatar');
-if (_sidebarAvatar && _user.email) {
-  _sidebarAvatar.textContent = _user.email[0].toUpperCase();
+if (_sidebarAvatar) _sidebarAvatar.textContent = IS_DEMO ? 'N' : (_user.email?.[0]||'?').toUpperCase();
+
+if (IS_DEMO) {
+  // Show demo banner
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#C9A84C;color:#fff;text-align:center;padding:7px 16px;font-size:12px;font-weight:700;font-family:"DM Mono",monospace;letter-spacing:1px;';
+  banner.innerHTML = '⚡ DEMO MODE — store.moveops.services &nbsp;·&nbsp; <a href="mailto:hello@moveops.services" style="color:#fff;text-decoration:underline">hello@moveops.services</a>';
+  document.body.prepend(banner);
+  document.querySelector('.main').style.marginTop = '34px';
+  document.querySelector('.sidebar').style.marginTop = '34px';
 }
 
 const SB = 'https://ysltwsexfeweqjmzdahs.supabase.co';
@@ -543,11 +555,13 @@ async function get(path) {
   return r.json();
 }
 async function post(path, body) {
+  if (IS_DEMO) { toast('⚡ Demo mode — changes not saved'); return [{ ...body, id: 'demo-' + Date.now() }]; }
   const r = await fetch(`${SB}/rest/v1/${path}`, { method:'POST', headers:HP, body:JSON.stringify(body) });
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function patch(path, body) {
+  if (IS_DEMO) { toast('⚡ Demo mode — changes not saved'); return [body]; }
   const r = await fetch(`${SB}/rest/v1/${path}`, { method:'PATCH', headers:HP, body:JSON.stringify(body) });
   return r.json();
 }
@@ -572,9 +586,89 @@ function updateBadge(){
   b.textContent = n; b.style.display = n>0 ? '' : 'none';
 }
 
+// ── DEMO DATA ─────────────────────────────────────────
+const DEMO_PHOTOS = [
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=70',
+  'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=70',
+  'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=70',
+  'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=70',
+  'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=70',
+  'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&q=70',
+];
+function demoData() {
+  const pid = 'demo-project-1';
+  const now = new Date();
+  const ago = (h) => new Date(now - h*3600000).toISOString();
+
+  projects = [{
+    id: pid, type:'store', client:'Nike SS26 — Window Campaign Spain',
+    location:'Spain', pm_email:'brand@nike.com', active:true,
+    color:'photos:2', created_at: ago(72), user_id:'demo'
+  }];
+
+  stores = [
+    { id:'ds1', project_id:pid, name:'El Corte Inglés Castellana', address:'P.º de la Castellana, 42, Madrid', contact_name:'Ana López', contact_phone:'+34 91 456 78 90', created_at:ago(70) },
+    { id:'ds2', project_id:pid, name:'Fnac Callao', address:'Preciados, 28, Madrid', contact_name:'Carlos Ruiz', contact_phone:'+34 91 595 62 00', created_at:ago(69) },
+    { id:'ds3', project_id:pid, name:'El Corte Inglés Portal de l'Àngel', address:'Portal de l'Àngel, 19, Barcelona', contact_name:'Marta Puig', contact_phone:'+34 93 306 38 00', created_at:ago(68) },
+    { id:'ds4', project_id:pid, name:'Zara Passeig de Gràcia', address:'Passeig de Gràcia, 16, Barcelona', contact_name:'Joan Ferrer', created_at:ago(67) },
+    { id:'ds5', project_id:pid, name:'Springfield Gran Vía Bilbao', address:'Gran Vía, 7, Bilbao', contact_name:null, created_at:ago(66) },
+  ];
+
+  reports = [
+    { id:'dr1', project_id:pid, store_id:'ds1', store_name:'El Corte Inglés Castellana', status:'complete', started_at:ago(20), completed_at:ago(18), contact_name:'Ana López', contact_signed:true, gps_lat:40.4378, gps_lng:-3.6877, created_at:ago(20) },
+    { id:'dr2', project_id:pid, store_id:'ds2', store_name:'Fnac Callao', status:'complete', started_at:ago(16), completed_at:ago(14), contact_name:'Carlos Ruiz', contact_signed:true, gps_lat:40.4200, gps_lng:-3.7025, created_at:ago(16) },
+    { id:'dr3', project_id:pid, store_id:'ds3', store_name:'El Corte Inglés Barcelona', status:'in_progress', started_at:ago(2), completed_at:null, contact_name:null, contact_signed:false, gps_lat:41.3851, gps_lng:2.1734, created_at:ago(2) },
+  ];
+
+  alerts = [
+    { id:'da1', project_id:pid, store_id:'ds1', type:'completion', message:'Installation complete — El Corte Inglés Castellana', sent_by:'El Corte Inglés Castellana', status:'resolved', gps_lat:40.4378, gps_lng:-3.6877, created_at:ago(18) },
+    { id:'da2', project_id:pid, store_id:'ds2', type:'completion', message:'Installation complete — Fnac Callao', sent_by:'Fnac Callao', status:'resolved', gps_lat:40.4200, gps_lng:-3.7025, created_at:ago(14) },
+    { id:'da3', project_id:pid, store_id:'ds4', type:'damaged', message:'[DAMAGED] Central display arrived with broken corner — Zara Passeig de Gràcia', sent_by:'Zara Passeig de Gràcia', status:'active', gps_lat:41.3920, gps_lng:2.1650, created_at:ago(3) },
+  ];
+
+  projectMaterials[pid] = [
+    { id:'dm1', project_id:pid, name:'Lateral panels', unit:'units', description:'White lacquered, 80×180cm' },
+    { id:'dm2', project_id:pid, name:'Central display', unit:'units', description:'Backlit, requires power' },
+    { id:'dm3', project_id:pid, name:'Vinyl stickers', unit:'units', description:'SS26 branding' },
+    { id:'dm4', project_id:pid, name:'Floor stand', unit:'units', description:'Chrome finish' },
+  ];
+}
+
+// Demo store report data
+const DEMO_REPORTS_DETAIL = {
+  dr1: {
+    photos: [
+      { id:'p1', report_id:'dr1', step_index:0, step_title:'Before photo', photo_url: DEMO_PHOTOS[1], gps_lat:40.4378, gps_lng:-3.6877, taken_at: new Date(Date.now()-20*3600000).toISOString() },
+      { id:'p2', report_id:'dr1', step_index:1, step_title:'Installation photo 1', photo_url: DEMO_PHOTOS[0], gps_lat:40.4378, gps_lng:-3.6877, taken_at: new Date(Date.now()-19.5*3600000).toISOString() },
+      { id:'p3', report_id:'dr1', step_index:2, step_title:'Installation photo 2', photo_url: DEMO_PHOTOS[2], gps_lat:40.4378, gps_lng:-3.6877, taken_at: new Date(Date.now()-19*3600000).toISOString() },
+      { id:'p4', report_id:'dr1', step_index:3, step_title:'After photo', photo_url: DEMO_PHOTOS[3], gps_lat:40.4378, gps_lng:-3.6877, taken_at: new Date(Date.now()-18*3600000).toISOString() },
+    ],
+    materials: [
+      { material_name:'Lateral panels', quantity_planned:2, quantity_received:2, ok:true, notes:null },
+      { material_name:'Central display', quantity_planned:1, quantity_received:1, ok:true, notes:null },
+      { material_name:'Vinyl stickers', quantity_planned:10, quantity_received:10, ok:true, notes:null },
+      { material_name:'Floor stand', quantity_planned:1, quantity_received:1, ok:true, notes:null },
+    ]
+  },
+  dr2: {
+    photos: [
+      { id:'p5', report_id:'dr2', step_index:0, step_title:'Before photo', photo_url: DEMO_PHOTOS[4], gps_lat:40.4200, gps_lng:-3.7025, taken_at: new Date(Date.now()-16*3600000).toISOString() },
+      { id:'p6', report_id:'dr2', step_index:1, step_title:'Installation photo 1', photo_url: DEMO_PHOTOS[5], gps_lat:40.4200, gps_lng:-3.7025, taken_at: new Date(Date.now()-15.5*3600000).toISOString() },
+      { id:'p7', report_id:'dr2', step_index:3, step_title:'After photo', photo_url: DEMO_PHOTOS[2], gps_lat:40.4200, gps_lng:-3.7025, taken_at: new Date(Date.now()-14*3600000).toISOString() },
+    ],
+    materials: [
+      { material_name:'Lateral panels', quantity_planned:2, quantity_received:2, ok:true, notes:null },
+      { material_name:'Central display', quantity_planned:1, quantity_received:1, ok:true, notes:null },
+      { material_name:'Vinyl stickers', quantity_planned:10, quantity_received:8, ok:false, notes:'2 units missing from shipment' },
+      { material_name:'Floor stand', quantity_planned:1, quantity_received:1, ok:true, notes:null },
+    ]
+  },
+};
+
 // ── LOAD ─────────────────────────────────────────────
 async function loadAll(){
-  // Ensure we have user id for RLS
+  if (IS_DEMO) { demoData(); renderAll(); return; }
+
   let _u = JSON.parse(sessionStorage.getItem('sb_user')||'{}');
   if (!_u.id) {
     try {
@@ -606,6 +700,7 @@ function renderAll(){
   renderAlertViews();
   renderReports();
   updateBadge();
+  if (IS_DEMO) setTimeout(() => openDetail('demo-project-1'), 100);
 }
 
 // ── OVERVIEW ─────────────────────────────────────────
@@ -805,11 +900,17 @@ function alertHTML(a){
 async function resolveAlert(id){
   const el = document.getElementById('al-'+id);
   if(el){ el.style.opacity='.4'; el.style.pointerEvents='none'; }
+  if (IS_DEMO) {
+    alerts = alerts.map(a => a.id===id ? {...a,status:'resolved'} : a);
+    updateBadge(); renderAlertViews();
+    if(currentId) renderDetailAlerts(currentId);
+    toast('✓ Alert resolved (demo)');
+    return;
+  }
   try {
     await patch(`alerts?id=eq.${id}`, { status: 'resolved' });
     alerts = alerts.map(a => a.id===id ? {...a,status:'resolved'} : a);
-    updateBadge();
-    renderAlertViews();
+    updateBadge(); renderAlertViews();
     if(currentId) renderDetailAlerts(currentId);
     toast('✓ Alert resolved');
   } catch(e){ toast('⚠ Could not update'); }
@@ -933,7 +1034,6 @@ async function openStoreReport(storeId) {
   const rep = reports.find(r => r.store_id === storeId);
 
   if (!rep) {
-    // No report yet — check for alerts
     const storeAlerts = alerts.filter(a => a.store_id === storeId || a.sent_by === store.name);
     if (!storeAlerts.length) {
       body.innerHTML = '<div class="store-modal-empty">No activity yet for this store.<br><span style="font-size:12px;margin-top:8px;display:block">Share the store link with the installation team to get started.</span></div>';
@@ -943,14 +1043,19 @@ async function openStoreReport(storeId) {
     return;
   }
 
-  // Load report details: photos + materials
+  // Load report details: photos + materials (demo uses in-memory data)
   let photos = [], materials = [];
-  try {
-    [photos, materials] = await Promise.all([
-      get(`report_photos?report_id=eq.${rep.id}&order=step_index.asc`),
-      get(`report_materials?report_id=eq.${rep.id}&order=created_at.asc`)
-    ]);
-  } catch(e) { console.warn('Report detail load:', e); }
+  if (IS_DEMO && DEMO_REPORTS_DETAIL[rep.id]) {
+    photos    = DEMO_REPORTS_DETAIL[rep.id].photos;
+    materials = DEMO_REPORTS_DETAIL[rep.id].materials;
+  } else {
+    try {
+      [photos, materials] = await Promise.all([
+        get(`report_photos?report_id=eq.${rep.id}&order=step_index.asc`),
+        get(`report_materials?report_id=eq.${rep.id}&order=created_at.asc`)
+      ]);
+    } catch(e) { console.warn('Report detail load:', e); }
+  }
 
   const storeAlerts = alerts.filter(a =>
     (a.store_id === storeId || a.sent_by === store.name) && a.type !== 'completion'
