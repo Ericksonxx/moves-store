@@ -438,8 +438,13 @@
     </div>
     <label class="form-label">Alert email</label>
     <input class="form-input" type="email" id="camp-email" value="hello@moveops.services">
+    <label class="form-label">Installation photos <span style="font-weight:400;color:var(--muted)">(photos taken during installation, in addition to before &amp; after)</span></label>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+      <input class="form-input" type="number" id="camp-during-photos" value="1" min="0" max="10" style="width:80px;flex-shrink:0">
+      <span style="font-size:13px;color:var(--muted)">photos during installation (0–10)</span>
+    </div>
     <label class="form-label">Project materials (one per line, format: Name · quantity)</label>
-    <textarea class="form-input" rows="4" placeholder="Lateral panels · 2&#10;Central display · 1&#10;Vinyl stickers · 10&#10;Floor stand · 1" id="camp-materials" style="resize:vertical"></textarea>
+    <textarea class="form-input" rows="3" placeholder="Lateral panels · 2&#10;Central display · 1&#10;Vinyl stickers · 10&#10;Floor stand · 1" id="camp-materials" style="resize:vertical"></textarea>
     <div class="modal-actions">
       <button class="btn-sm ghost" onclick="closeModal()">Cancel</button>
       <button class="btn-sm primary" id="modal-btn" onclick="createCampaign()">Create campaign →</button>
@@ -679,7 +684,8 @@ function openDetail(id){
 
   document.getElementById('detail-title').textContent = p.client;
   document.getElementById('print-title').textContent = p.client;
-  document.getElementById('detail-meta').innerHTML = `<span>${esc(p.client)}</span><span>·</span><span>${esc(p.location)}</span><span>·</span><span>${fmtDate(p.created_at)}</span>`;
+  const duringN = p.color && p.color.startsWith('photos:') ? parseInt(p.color.split(':')[1]) : 1;
+  document.getElementById('detail-meta').innerHTML = `<span>${esc(p.client)}</span><span>·</span><span>${esc(p.location)}</span><span>·</span><span>📸 ${1 + duringN + 1} photos per store</span><span>·</span><span>${fmtDate(p.created_at)}</span>`;
   document.getElementById('print-meta').textContent = `Execution report · Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`;
 
   const pa = alertsFor(id);
@@ -1223,6 +1229,7 @@ async function createCampaign() {
   const location = document.getElementById('camp-location').value.trim() || 'Spain';
   const email = document.getElementById('camp-email').value.trim() || 'hello@moveops.services';
   const materialsText = document.getElementById('camp-materials')?.value?.trim() || '';
+  const duringPhotos = parseInt(document.getElementById('camp-during-photos')?.value) || 1;
   if (!name) { document.getElementById('camp-name').focus(); return; }
   const btn = document.getElementById('modal-btn');
   btn.textContent = 'Creating...'; btn.disabled = true;
@@ -1231,7 +1238,7 @@ async function createCampaign() {
     if (!uid) {
       try { const ru = await fetch(`${SB}/auth/v1/user`,{headers:H}); const uu=await ru.json(); uid=uu.id; sessionStorage.setItem('sb_user',JSON.stringify({id:uu.id,email:uu.email})); } catch(e){}
     }
-    const data = await post('projects', { type:'store', client:name||brand||'Campaign', location, pm_email:email, active:true, user_id:uid });
+    const data = await post('projects', { type:'store', client:name||brand||'Campaign', location, pm_email:email, active:true, user_id:uid, color:'photos:'+duringPhotos });
     const p = Array.isArray(data) ? data[0] : data;
     projects.unshift(p);
 

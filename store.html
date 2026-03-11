@@ -82,21 +82,29 @@
     .photo-gps-tag { display: inline-flex; align-items: center; gap: 5px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent2); background: var(--bg); padding: 4px 8px; border-radius: 5px; margin-top: 6px; }
     .photo-gps-tag.hidden { display: none; }
 
-    /* materials */
-    .materials-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-    .mat-item { background: var(--bg); border-radius: 10px; padding: 12px 14px; }
-    .mat-item-row { display: flex; align-items: center; gap: 10px; }
-    .mat-status { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 16px; border: 2px solid var(--border); background: var(--white); transition: all 0.15s; }
-    .mat-status.ok  { background: var(--green); border-color: var(--green); color: #fff; }
-    .mat-status.nok { background: var(--red);   border-color: var(--red);   color: #fff; }
-    .mat-info { flex: 1; min-width: 0; }
-    .mat-name { font-size: 14px; font-weight: 600; color: var(--ink); }
-    .mat-planned { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .mat-qty-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .mat-qty-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); line-height: 1; }
-    .mat-qty-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 600; min-width: 24px; text-align: center; }
-    .mat-notes-input { display: none; width: 100%; margin-top: 8px; background: var(--white); border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; }
-    .mat-item.has-issue .mat-notes-input { display: block; }
+    /* materials one-at-a-time */
+    .mat-card { margin-top: 14px; }
+    .mat-progress { display: flex; gap: 4px; margin-bottom: 16px; }
+    .mat-prog-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+    .mat-prog-dot.done { background: var(--green); }
+    .mat-prog-dot.current { background: var(--accent2); }
+    .mat-single { background: var(--bg); border-radius: 14px; padding: 24px 20px; text-align: center; }
+    .mat-single-name { font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+    .mat-single-planned { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+    .mat-qty-big { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+    .mat-qty-big-btn { width: 48px; height: 48px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--white); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); transition: all 0.15s; }
+    .mat-qty-big-btn:hover { border-color: var(--accent2); }
+    .mat-qty-big-val { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 700; color: var(--ink); min-width: 56px; text-align: center; }
+    .mat-ok-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .mat-ok-btn { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid var(--border); background: var(--white); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+    .mat-ok-btn.ok-active  { background: var(--green); border-color: var(--green); color: #fff; }
+    .mat-ok-btn.nok-active { background: var(--red); border-color: var(--red); color: #fff; }
+    .mat-notes-input { width: 100%; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--ink); outline: none; margin-bottom: 10px; display: none; }
+    .mat-notes-input.show { display: block; }
+    .mat-nav { display: flex; gap: 10px; margin-top: 4px; }
+    .mat-nav-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--white); font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--muted); transition: all 0.15s; }
+    .mat-nav-btn:hover { border-color: var(--accent2); color: var(--accent); }
+    .mat-nav-btn.next { background: var(--accent); border-color: var(--accent); color: #fff; }
     .mat-no-items { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 0; }
 
     /* contact */
@@ -320,6 +328,29 @@ window.addEventListener('load', async () => {
       }
     }
 
+    // Read number of during-installation photos from color field
+    const duringPhotos = p.color && p.color.startsWith('photos:')
+      ? Math.max(0, Math.min(10, parseInt(p.color.split(':')[1]) || 1))
+      : 1;
+
+    // Build steps dynamically
+    const steps = [
+      { id:'s_before', title:'Before photo', desc:'Photo of the space before installation starts', type:'photo' },
+    ];
+    for (let i = 0; i < duringPhotos; i++) {
+      steps.push({
+        id: `s_during_${i}`,
+        title: duringPhotos === 1 ? 'Installation photo' : `Installation photo ${i+1} of ${duringPhotos}`,
+        desc: 'Photo showing installation in progress',
+        type: 'photo'
+      });
+    }
+    steps.push(
+      { id:'s_mat',  title:'Materials received',   desc:'Confirm all materials received at this store', type:'materials' },
+      { id:'s_cont', title:'Contact & signature',  desc:'Store contact name and signature',             type:'contact'   },
+      { id:'s_after',title:'After photo',          desc:'Photo of the completed installation',          type:'photo'     }
+    );
+
     project = {
       id: projectId, storeId,
       name: p.client || 'Installation',
@@ -327,12 +358,7 @@ window.addEventListener('load', async () => {
       store: storeName, storeAddress,
       pm_email: p.pm_email || 'hello@moveops.services',
       materials,
-      steps: [
-        { id:'s1', title:'Before photo',        desc:'Photo of the space before starting',       type:'photo'     },
-        { id:'s2', title:'Materials received',  desc:'Confirm all materials received at store',  type:'materials' },
-        { id:'s3', title:'Contact & signature', desc:'Store contact name and signature',         type:'contact'   },
-        { id:'s4', title:'Installation complete', desc:'Photo of the final result',              type:'photo'     },
-      ]
+      steps
     };
 
     stepStates = project.steps.map(() => ({ done: false, photo: null, photoUrl: null }));
@@ -472,39 +498,96 @@ function renderSteps() {
   if (currentStep === ci && !stepStates[ci]?.done) setTimeout(initSigPad, 50);
 }
 
+// currentMatIndex tracks which material is being shown in the one-at-a-time UI
+let currentMatIndex = 0;
+
 function renderMaterialsHTML() {
   const mats = project.materials;
-  if (!mats.length) return `<div class="mat-no-items">No materials set for this store.<br><small>Ask your PM to add them in the dashboard.</small></div>`;
-  let html = '<div class="materials-list">';
-  mats.forEach((m, j) => {
-    html += `
-      <div class="mat-item ${!m.ok ? 'has-issue':''}" id="mat-${j}">
-        <div class="mat-item-row">
-          <div class="mat-status ${m.ok?'ok':'nok'}" onclick="toggleMat(${j})">${m.ok?'✓':'✗'}</div>
-          <div class="mat-info">
-            <div class="mat-name">${m.name}</div>
-            <div class="mat-planned">Planned: ${m.planned} ${m.unit}</div>
-          </div>
-          <div class="mat-qty-wrap">
-            <button class="mat-qty-btn" onclick="changeQty(${j},-1)">−</button>
-            <div class="mat-qty-val" id="mq-${j}">${m.received}</div>
-            <button class="mat-qty-btn" onclick="changeQty(${j},+1)">+</button>
-          </div>
-        </div>
-        <input class="mat-notes-input" type="text" id="mn-${j}" placeholder="What's wrong?" value="${m.notes}" oninput="project.materials[${j}].notes=this.value">
-      </div>`;
-  });
-  return html + '</div>';
+  if (!mats.length) return `<div class="mat-no-items">No materials defined for this store.<br><small>Your PM can add materials in the dashboard.</small></div>`;
+  return renderSingleMat(currentMatIndex);
+}
+
+function renderSingleMat(j) {
+  const mats = project.materials;
+  const m = mats[j];
+  if (!m) return '';
+  const total = mats.length;
+  const allDone = j >= total; // all reviewed
+
+  // Progress dots
+  let dots = '';
+  for (let i = 0; i < total; i++) {
+    const cls = i < j ? 'done' : i === j ? 'current' : '';
+    dots += `<div class="mat-prog-dot ${cls}"></div>`;
+  }
+
+  const isLast = j === total - 1;
+  const isFirst = j === 0;
+  const okActive  = m.ok === true  ? 'ok-active'  : '';
+  const nokActive = m.ok === false ? 'nok-active' : '';
+  const notesShow = m.ok === false ? 'show' : '';
+
+  return `<div class="mat-card">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Material ${j+1} of ${total}</div>
+    <div class="mat-progress">${dots}</div>
+    <div class="mat-single">
+      <div class="mat-single-name">${esc(m.name)}</div>
+      <div class="mat-single-planned">Planned quantity: ${m.planned} ${m.unit}</div>
+      <div class="mat-qty-big">
+        <button class="mat-qty-big-btn" onclick="changeQty(${j},-1)">−</button>
+        <div class="mat-qty-big-val" id="mq-${j}">${m.received}</div>
+        <button class="mat-qty-big-btn" onclick="changeQty(${j},+1)">+</button>
+      </div>
+      <div class="mat-ok-row">
+        <button class="mat-ok-btn ok-active ${okActive}" id="mok-${j}" onclick="setMatOk(${j},true)">✓ OK</button>
+        <button class="mat-ok-btn nok-active ${nokActive}" id="mnok-${j}" onclick="setMatOk(${j},false)">✗ Issue</button>
+      </div>
+      <input class="mat-notes-input ${notesShow}" type="text" id="mn-${j}"
+        placeholder="What's wrong? (optional)"
+        value="${esc(m.notes)}"
+        oninput="project.materials[${j}].notes=this.value">
+    </div>
+    <div class="mat-nav">
+      ${!isFirst ? `<button class="mat-nav-btn" onclick="matNav(${j-1})">← Previous</button>` : '<div style="flex:1"></div>'}
+      <button class="mat-nav-btn next" onclick="matNav(${j+1})">${isLast ? 'Done ✓' : 'Next →'}</button>
+    </div>
+  </div>`;
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function matNav(j) {
+  const mats = project.materials;
+  if (j >= mats.length) {
+    // All materials reviewed — confirm the step
+    const stepIdx = project.steps.findIndex(s => s.type === 'materials');
+    if (stepIdx >= 0) confirmStep(stepIdx);
+    return;
+  }
+  currentMatIndex = j;
+  // Re-render just the materials step body
+  const stepIdx = project.steps.findIndex(s => s.type === 'materials');
+  const bodyEl = document.querySelector(`#step-card-${stepIdx} .step-body`);
+  if (bodyEl) {
+    const confirmBtn = bodyEl.querySelector('.btn-confirm');
+    const matEl = bodyEl.querySelector('.mat-card, .mat-no-items');
+    if (matEl) matEl.outerHTML = renderSingleMat(currentMatIndex);
+    else bodyEl.insertAdjacentHTML('afterbegin', renderSingleMat(currentMatIndex));
+    if (confirmBtn) confirmBtn.remove(); // remove confirm button — nav drives flow
+  }
+}
+
+function setMatOk(j, ok) {
+  project.materials[j].ok = ok;
+  const okBtn  = document.getElementById('mok-'  + j);
+  const nokBtn = document.getElementById('mnok-' + j);
+  const notes  = document.getElementById('mn-'   + j);
+  if (okBtn)  { okBtn.className  = 'mat-ok-btn ok-active'  + (ok  ? ' ok-active'  : ''); okBtn.className  = ok  ? 'mat-ok-btn ok-active'  : 'mat-ok-btn'; }
+  if (nokBtn) { nokBtn.className = ok ? 'mat-ok-btn' : 'mat-ok-btn nok-active'; }
+  if (notes)  { notes.className  = ok ? 'mat-notes-input' : 'mat-notes-input show'; }
 }
 
 // ── MATERIALS ─────────────────────────────────────────────────────────────────
-function toggleMat(j) {
-  project.materials[j].ok = !project.materials[j].ok;
-  const item = document.getElementById('mat-' + j);
-  const btn  = item?.querySelector('.mat-status');
-  if (btn) { btn.className = 'mat-status ' + (project.materials[j].ok ? 'ok' : 'nok'); btn.textContent = project.materials[j].ok ? '✓' : '✗'; }
-  item?.classList.toggle('has-issue', !project.materials[j].ok);
-}
 function changeQty(j, d) {
   project.materials[j].received = Math.max(0, (project.materials[j].received || 0) + d);
   const el = document.getElementById('mq-' + j);
@@ -552,7 +635,10 @@ function confirmStep(i) {
   if (!canConfirm(i)) return;
   stepStates[i].done = true;
   if (i < project.steps.length-1) {
-    currentStep = i+1; renderSteps(); updateProgress(); showToast('✓ Step complete!');
+    currentStep = i+1;
+    // Reset material carousel when entering materials step
+    if (project.steps[currentStep]?.type === 'materials') currentMatIndex = 0;
+    renderSteps(); updateProgress(); showToast('✓ Step complete!');
     setTimeout(() => document.getElementById('step-card-'+currentStep)?.scrollIntoView({behavior:'smooth',block:'start'}), 200);
   } else { updateProgress(); renderSteps(); setTimeout(finishInstallation, 600); }
 }
